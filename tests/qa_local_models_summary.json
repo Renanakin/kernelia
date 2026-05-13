@@ -1,0 +1,26 @@
+﻿{
+    "timestamp":  "2026-05-11T14:48:36.7956247-04:00",
+    "endpoint":  "http://localhost:21434/engines/llama.cpp/v1",
+    "gemma3":  {
+                   "model":  "docker.io/ai/gemma3:latest",
+                   "total":  15,
+                   "pass":  15,
+                   "fail":  0,
+                   "rate":  100,
+                   "grade":  "10/10",
+                   "gate":  true,
+                   "report":  "C:\\Users\\Hackteck\\Downloads\\nexus-lite-develop\\tests\\qa_gemma3_results.json"
+               },
+    "gemma4":  {
+                   "model":  "docker.io/ai/gemma4:latest",
+                   "total":  15,
+                   "pass":  15,
+                   "fail":  0,
+                   "rate":  100,
+                   "grade":  "10/10",
+                   "gate":  true,
+                   "report":  "C:\\Users\\Hackteck\\Downloads\\nexus-lite-develop\\tests\\qa_gemma4_results.json"
+               },
+    "global_gate":  true,
+    "required_grade":  "\u003e= 9/10 each"
+}

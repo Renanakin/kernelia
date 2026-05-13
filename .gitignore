@@ -1,0 +1,43 @@
+# Build outputs
+/build
+/.svelte-kit
+/package
+/dist
+
+# Dependencies
+node_modules
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# Rust / Tauri
+/src-tauri/target/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Runtime config (portable, generated)
+/config/settings.json
+/config/history.db
+
+# Logs
+*.log
+
+ipa groq.txt
+__pycache__/
+*.pyc
+

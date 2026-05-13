@@ -1,0 +1,16 @@
+﻿{
+    "timestamp":  "2026-05-12T22:04:45.9368044-04:00",
+    "endpoint":  "http://localhost:11435/v1",
+    "gemma3":  {
+                   "model":  "gemma3",
+                   "total":  15,
+                   "pass":  15,
+                   "fail":  0,
+                   "rate":  100,
+                   "grade":  "10/10",
+                   "gate":  true,
+                   "report":  "C:\\Users\\Hackteck\\Downloads\\nexus-lite-develop\\tests\\qa_gemma3_21434_results.json"
+               },
+    "global_gate":  true,
+    "required_grade":  "\u003e= 9/10"
+}

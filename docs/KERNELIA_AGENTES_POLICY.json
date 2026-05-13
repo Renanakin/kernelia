@@ -1,0 +1,120 @@
+{
+  "version": "1.0.0",
+  "standard": "KernelIA High Security Decision Standard",
+  "global": {
+    "defaultDecision": "deny",
+    "requiresAudit": true,
+    "requiresEvidence": true,
+    "confidenceThresholds": {
+      "auto": 0.9,
+      "coreReview": 0.75,
+      "simulateOnly": 0.6
+    },
+    "riskRules": {
+      "R0": "read-only",
+      "R1": "low-impact reversible",
+      "R2": "core-approval",
+      "R3": "owner-approval + snapshot",
+      "R4": "owner + megaboss + dual-confirm"
+    }
+  },
+  "agents": [
+    {
+      "name": "KernelIA-System-Profiler",
+      "specialty": "system_info",
+      "maxRisk": "R0",
+      "minRole": "Viewer"
+    },
+    {
+      "name": "KernelIA-Realtime-Telemetry",
+      "specialty": "realtime_telemetry",
+      "maxRisk": "R1",
+      "minRole": "Viewer"
+    },
+    {
+      "name": "KernelIA-Network-Intel",
+      "specialty": "network",
+      "maxRisk": "R2",
+      "minRole": "PowerUser"
+    },
+    {
+      "name": "KernelIA-Process-Guardian",
+      "specialty": "processes",
+      "maxRisk": "R3",
+      "minRole": "PowerUser"
+    },
+    {
+      "name": "KernelIA-Service-Controller",
+      "specialty": "windows_services",
+      "maxRisk": "R3",
+      "minRole": "PowerUser"
+    },
+    {
+      "name": "KernelIA-Maintenance-Operator",
+      "specialty": "maintenance",
+      "maxRisk": "R3",
+      "minRole": "PowerUser"
+    },
+    {
+      "name": "KernelIA-Security-Sentinel",
+      "specialty": "local_security",
+      "maxRisk": "R4",
+      "minRole": "Owner"
+    },
+    {
+      "name": "KernelIA-Driver-Engineer",
+      "specialty": "drivers",
+      "maxRisk": "R2",
+      "minRole": "PowerUser"
+    },
+    {
+      "name": "KernelIA-Filesystem-Operator",
+      "specialty": "filesystem",
+      "maxRisk": "R4",
+      "minRole": "Owner"
+    },
+    {
+      "name": "KernelIA-Audit-Analyst",
+      "specialty": "logs_audit",
+      "maxRisk": "R1",
+      "minRole": "Viewer"
+    },
+    {
+      "name": "KernelIA-Performance-Tuner",
+      "specialty": "power_performance",
+      "maxRisk": "R2",
+      "minRole": "PowerUser"
+    },
+    {
+      "name": "KernelIA-Software-Lifecycle",
+      "specialty": "software_lifecycle",
+      "maxRisk": "R3",
+      "minRole": "PowerUser"
+    },
+    {
+      "name": "KernelIA-Sensitive-Executor",
+      "specialty": "sensitive_commands",
+      "maxRisk": "R4",
+      "minRole": "Owner"
+    },
+    {
+      "name": "KernelIA-MegaBoss-CriticalOps",
+      "specialty": "megaboss_critical",
+      "maxRisk": "R4",
+      "minRole": "Owner",
+      "requiresMegaboss": true,
+      "requiresDualApproval": true,
+      "sessionTtlSeconds": 900
+    }
+  ],
+  "orchestrator": {
+    "name": "KernelIA-Core-Orchestrator",
+    "role": "coordination",
+    "canExecuteSensitive": false,
+    "mustEscalateOn": [
+      "confidence_below_threshold",
+      "policy_conflict",
+      "rollback_failure"
+    ]
+  }
+}

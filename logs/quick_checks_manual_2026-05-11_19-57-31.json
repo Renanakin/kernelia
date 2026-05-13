@@ -1,0 +1,188 @@
+﻿{
+    "generated_at":  {
+                         "value":  "\/Date(1778543855327)\/",
+                         "DisplayHint":  2,
+                         "DateTime":  "lunes, 11 de mayo de 2026 19:57:35"
+                     },
+    "system_health":  {
+                          "cpu_load":  11,
+                          "os":  "Microsoft Windows 11 Pro Insider Preview",
+                          "mem_total_gb":  27.59,
+                          "mem_free_gb":  12.77
+                      },
+    "network_check":  {
+                          "dns":  {
+                                      "Name":  "github.com",
+                                      "IPAddress":  "140.82.113.3"
+                                  },
+                          "ping":  [
+                                       {
+                                           "Address":  "8.8.8.8",
+                                           "Latency":  null,
+                                           "Status":  null
+                                       },
+                                       {
+                                           "Address":  "8.8.8.8",
+                                           "Latency":  null,
+                                           "Status":  null
+                                       }
+                                   ]
+                      },
+    "autostart_audit":  [
+                            {
+                                "Name":  "GoogleDriveFS",
+                                "Command":  "C:\\Program Files\\Google\\Drive File Stream\\124.0.3.0\\GoogleDriveFS.exe --startup_mode",
+                                "Location":  "HKU\\S-1-5-18\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "User":  "NT AUTHORITY\\SYSTEM"
+                            },
+                            {
+                                "Name":  "OneDrive",
+                                "Command":  "\"C:\\Program Files\\Microsoft OneDrive\\OneDrive.exe\" /background",
+                                "Location":  "HKU\\S-1-5-21-1407655343-2929344484-1916899635-1001\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "User":  "GFRONT\\Hackteck"
+                            },
+                            {
+                                "Name":  "Discord",
+                                "Command":  "\"C:\\Users\\Hackteck\\AppData\\Local\\Discord\\Update.exe\" --processStart Discord.exe",
+                                "Location":  "HKU\\S-1-5-21-1407655343-2929344484-1916899635-1001\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "User":  "GFRONT\\Hackteck"
+                            },
+                            {
+                                "Name":  "Steam",
+                                "Command":  "\"C:\\Program Files (x86)\\Steam\\steam.exe\" -silent",
+                                "Location":  "HKU\\S-1-5-21-1407655343-2929344484-1916899635-1001\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "User":  "GFRONT\\Hackteck"
+                            },
+                            {
+                                "Name":  "GogGalaxy",
+                                "Command":  "C:\\Program Files (x86)\\GOG Galaxy\\GalaxyClient.exe /launchViaAutoStart",
+                                "Location":  "HKU\\S-1-5-21-1407655343-2929344484-1916899635-1001\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "User":  "GFRONT\\Hackteck"
+                            },
+                            {
+                                "Name":  "EpicGamesLauncher",
+                                "Command":  "\"C:\\Program Files (x86)\\Epic Games\\Launcher\\Portal\\Binaries\\Win64\\EpicGamesLauncher.exe\" -silent -launchcontext=boot",
+                                "Location":  "HKU\\S-1-5-21-1407655343-2929344484-1916899635-1001\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "User":  "GFRONT\\Hackteck"
+                            },
+                            {
+                                "Name":  "WallpaperEngine",
+                                "Command":  "\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\wallpaper_engine\\wallpaper64.exe\" -silent",
+                                "Location":  "HKU\\S-1-5-21-1407655343-2929344484-1916899635-1001\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "User":  "GFRONT\\Hackteck"
+                            },
+                            {
+                                "Name":  "EADM",
+                                "Command":  "\"C:\\Program Files\\Electronic Arts\\EA Desktop\\EA Desktop\\EALauncher.exe\" -silent",
+                                "Location":  "HKU\\S-1-5-21-1407655343-2929344484-1916899635-1001\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "User":  "GFRONT\\Hackteck"
+                            },
+                            {
+                                "Name":  "Microsoft.Lists",
+                                "Command":  "C:\\Program Files\\Microsoft OneDrive\\26.074.0420.0001\\OneDrive.Sync.Service.exe",
+                                "Location":  "HKU\\S-1-5-21-1407655343-2929344484-1916899635-1001\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "User":  "GFRONT\\Hackteck"
+                            },
+                            {
+                                "Name":  "Teams",
+                                "Command":  "\"C:\\Users\\Hackteck\\AppData\\Local\\Microsoft\\WindowsApps\\MSTeams_8wekyb3d8bbwe\\ms-teams.exe\" msteams:system-initiated",
+                                "Location":  "HKU\\S-1-5-21-1407655343-2929344484-1916899635-1001\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "User":  "GFRONT\\Hackteck"
+                            },
+                            {
+                                "Name":  "SmartConnect",
+                                "Command":  "\"C:\\Program Files\\Lenovo\\Ready For Assistant\\SmartConnect.exe\" /mode:background /startup",
+                                "Location":  "HKU\\S-1-5-21-1407655343-2929344484-1916899635-1001\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "User":  "GFRONT\\Hackteck"
+                            },
+                            {
+                                "Name":  "com.poly.lens.client.app",
+                                "Command":  "C:\\Program Files\\Poly\\Poly Lens Desktop\\lens-desktop.exe --openAsHidden",
+                                "Location":  "HKU\\S-1-5-21-1407655343-2929344484-1916899635-1001\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "User":  "GFRONT\\Hackteck"
+                            },
+                            {
+                                "Name":  "EPSDNMON",
+                                "Command":  "\"C:\\Program Files (x86)\\EPSON Software\\Download Navigator\\EPSDNMON.EXE\"",
+                                "Location":  "HKU\\S-1-5-21-1407655343-2929344484-1916899635-1001\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "User":  "GFRONT\\Hackteck"
+                            },
+                            {
+                                "Name":  "GoogleDriveFS",
+                                "Command":  "\"C:\\Program Files\\Google\\Drive File Stream\\124.0.3.0\\GoogleDriveFS.exe\" --startup_mode",
+                                "Location":  "HKU\\S-1-5-21-1407655343-2929344484-1916899635-1001\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "User":  "GFRONT\\Hackteck"
+                            },
+                            {
+                                "Name":  "CometUpdaterTaskUser145.2.7632.4583",
+                                "Command":  "\"C:\\Users\\Hackteck\\AppData\\Local\\Perplexity\\CometUpdater\\145.2.7632.4583\\updater.exe\" --wake",
+                                "Location":  "HKU\\S-1-5-21-1407655343-2929344484-1916899635-1001\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "User":  "GFRONT\\Hackteck"
+                            },
+                            {
+                                "Name":  "Docker Desktop",
+                                "Command":  "C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe",
+                                "Location":  "HKU\\S-1-5-21-1407655343-2929344484-1916899635-1001\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "User":  "GFRONT\\Hackteck"
+                            },
+                            {
+                                "Name":  "MicrosoftCopilotAutoLaunch_CD73A19A44E6B7556775535B17FD7B5B",
+                                "Command":  "\"C:\\Program Files (x86)\\Microsoft\\Copilot\\Application\\mscopilot.exe\" --no-startup-window --win-session-start",
+                                "Location":  "HKU\\S-1-5-21-1407655343-2929344484-1916899635-1001\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "User":  "GFRONT\\Hackteck"
+                            },
+                            {
+                                "Name":  "MicrosoftEdgeAutoLaunch_502A0F204420A2F8E07BB36CD5E19D62",
+                                "Command":  "\"C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe\" --no-startup-window --win-session-start",
+                                "Location":  "HKU\\S-1-5-21-1407655343-2929344484-1916899635-1001\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "User":  "GFRONT\\Hackteck"
+                            },
+                            {
+                                "Name":  "GoogleDriveFS",
+                                "Command":  "C:\\Program Files\\Google\\Drive File Stream\\124.0.3.0\\GoogleDriveFS.exe --startup_mode",
+                                "Location":  "HKU\\.DEFAULT\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "User":  ".DEFAULT"
+                            },
+                            {
+                                "Name":  "LensDesktop1xUninstaller",
+                                "Command":  "C:\\PROGRA~1\\Poly\\Poly Lens Desktop\\LensDesktop1xUninstaller\\LensDesktop1xUninstaller.exe ",
+                                "Location":  "Common Startup",
+                                "User":  "Public"
+                            },
+                            {
+                                "Name":  "SecurityHealth",
+                                "Command":  "%windir%\\system32\\SecurityHealthSystray.exe",
+                                "Location":  "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "User":  "Public"
+                            },
+                            {
+                                "Name":  "RtkAudUService",
+                                "Command":  "\"C:\\WINDOWS\\System32\\DriverStore\\FileRepository\\realtekservice.inf_amd64_9c1740101495ba23\\RtkAudUService64.exe\" -background",
+                                "Location":  "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "User":  "Public"
+                            },
+                            {
+                                "Name":  "RazerCortex",
+                                "Command":  "\"C:\\Program Files (x86)\\Razer\\Razer Cortex\\RazerCortex.exe\" -autorun",
+                                "Location":  "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "User":  "Public"
+                            },
+                            {
+                                "Name":  "com.poly.lens.client.watchdog.lh",
+                                "Command":  "\"C:\\Program Files\\Poly\\Poly Lens Desktop\\ProcessWatchdog\\PolyLensProcessWatchdog.exe\" \"C:\\Program Files\\Poly\\Poly Lens Desktop\\LegacyHost\\LegacyHost.exe\"",
+                                "Location":  "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "User":  "Public"
+                            },
+                            {
+                                "Name":  "com.poly.lens.client.watchdog.cc",
+                                "Command":  "\"C:\\Program Files\\Poly\\Poly Lens Desktop\\ProcessWatchdog\\PolyLensProcessWatchdog.exe\" \"C:\\Program Files\\Poly\\Poly Lens Desktop\\\\CallControlApp\\PolyLensCallControlApp.exe\"",
+                                "Location":  "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                "User":  "Public"
+                            }
+                        ],
+    "junk_scan":  {
+                      "temp_path":  "C:\\Users\\Hackteck\\AppData\\Local\\Temp",
+                      "files":  3683,
+                      "total_mb":  5616.37
+                  }
+}
