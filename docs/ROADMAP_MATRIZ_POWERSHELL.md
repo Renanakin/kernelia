@@ -84,9 +84,9 @@ timeline
 - **`SensitiveOps`**: `shutdown /r /t 0`, `shutdown /s /t 0`.
 
 ### Hitos y Entregables
-1. [ ] Simulación previa obligatoria (`supports_dry_run`) antes de ejecutar reparaciones de DISM o borrado de drivers.
-2. [ ] Verificación de autenticación de rol `Megaboss` y token de seguridad en `tool_verifier.rs`.
-3. [ ] Registro auditado inmutable en la base SQLite de KernelIA.
+1. [x] Simulación previa obligatoria (`supports_dry_run`) antes de ejecutar reparaciones de DISM o borrado de drivers.
+2. [x] Verificación de autenticación de rol `Megaboss` y token de seguridad en `tool_verifier.rs`.
+3. [x] Registro auditado inmutable en la base SQLite de KernelIA.
 
 ---
 

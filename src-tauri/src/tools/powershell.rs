@@ -181,6 +181,59 @@ pub fn optimize_volume_ps(drive_letter: &str) -> ToolResult {
     run_powershell_cmdlet("optimize_volume", &cmd)
 }
 
+// --- FASE 4: OPERACIONES SENSIBLES Y GUARDRAILS DEL KERNEL (R3 / R4) ---
+
+/// Deshabilitar Dispositivo PnP (DriversAgent/SensitiveOps): Disable-PnpDevice [R3]
+pub fn disable_pnp_device_ps(instance_id: &str) -> ToolResult {
+    let cmd = format!("Disable-PnpDevice -InstanceId '{}' -Confirm:$false", instance_id);
+    run_powershell_cmdlet("disable_pnp_device", &cmd)
+}
+
+/// Habilitar Dispositivo PnP (DriversAgent): Enable-PnpDevice [R2]
+pub fn enable_pnp_device_ps(instance_id: &str) -> ToolResult {
+    let cmd = format!("Enable-PnpDevice -InstanceId '{}' -Confirm:$false", instance_id);
+    run_powershell_cmdlet("enable_pnp_device", &cmd)
+}
+
+/// Eliminar Paquete de Controladores OEM (DriversAgent): pnputil /delete-driver [R3]
+pub fn delete_driver_oem_ps(oem_name: &str) -> ToolResult {
+    let cmd = format!("pnputil /delete-driver {} /force", oem_name);
+    run_powershell_cmdlet("delete_driver_oem", &cmd)
+}
+
+/// Reparación Completa de Imagen del Sistema (SystemAgent): DISM /RestoreHealth [R3]
+pub fn dism_restore_health_ps() -> ToolResult {
+    run_powershell_cmdlet("dism_restore_health", "DISM /Online /Cleanup-Image /RestoreHealth")
+}
+
+/// Reinicio de Sistema Operativo con Guardrail Megaboss (SensitiveOps) [R4]
+pub fn system_reboot_ps(is_megaboss: bool, delay_seconds: u32) -> ToolResult {
+    if !is_megaboss {
+        return ToolResult {
+            tool_name: "system_reboot".to_string(),
+            success: false,
+            output: String::new(),
+            error: Some("MEGABOSS_ROLE_REQUIRED: El reinicio de sistema es una operación R4 que requiere autorización de rol Megaboss.".to_string()),
+        };
+    }
+    let cmd = format!("shutdown /r /t {}", delay_seconds);
+    run_powershell_cmdlet("system_reboot", &cmd)
+}
+
+/// Apagado de Sistema Operativo con Guardrail Megaboss (SensitiveOps) [R4]
+pub fn system_poweroff_ps(is_megaboss: bool, delay_seconds: u32) -> ToolResult {
+    if !is_megaboss {
+        return ToolResult {
+            tool_name: "system_poweroff".to_string(),
+            success: false,
+            output: String::new(),
+            error: Some("MEGABOSS_ROLE_REQUIRED: El apagado del sistema es una operación R4 que requiere autorización de rol Megaboss.".to_string()),
+        };
+    }
+    let cmd = format!("shutdown /s /t {}", delay_seconds);
+    run_powershell_cmdlet("system_poweroff", &cmd)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -197,5 +250,12 @@ mod tests {
         let res = stop_process_safe_ps(1234, "svchost.exe");
         assert!(!res.success);
         assert!(res.error.unwrap_or_default().contains("GUARDRAIL_BLOCKED"));
+    }
+
+    #[test]
+    fn blocks_unauthorized_r4_system_reboot() {
+        let res = system_reboot_ps(false, 0);
+        assert!(!res.success);
+        assert!(res.error.unwrap_or_default().contains("MEGABOSS_ROLE_REQUIRED"));
     }
 }
