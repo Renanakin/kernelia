@@ -101,5 +101,5 @@ timeline
 4. `SystemAgent` emite el informe consolidado final al usuario con la traza RAG completa.
 
 ### Hitos y Entregables
-1. [ ] Enrutamiento multi-especialista en `specialty_router.rs`.
-2. [ ] Generación automática de documentación operacional de la intervención.
+1. [x] Enrutamiento multi-especialista en `specialty_router.rs`.
+2. [x] Generación automática de documentación operacional de la intervención.
