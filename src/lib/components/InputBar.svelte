@@ -71,7 +71,9 @@
         response.text,
         response.tools_used,
         response.model,
-        response.error
+        response.error,
+        response.rag_context,
+        response.rag_comparison
       );
     } catch (e) {
       resolveLoadingMessage(loadingId, '', [], null, String(e?.message || e));

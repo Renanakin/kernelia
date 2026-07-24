@@ -1,4 +1,6 @@
 use super::models::*;
+use super::specialty_agent;
+use super::tool_verifier;
 use crate::config::AppSettings;
 use crate::tools::ToolEngine;
 use futures_util::StreamExt;
@@ -8,69 +10,8 @@ const LOCAL_HISTORY_LIMIT: usize = 12;
 const TOOL_SHORTLIST_LIMIT: usize = 12;
 
 fn build_tool_shortlist(last_user_message: &str) -> Vec<crate::tools::ToolDefinition> {
-    let text = last_user_message.to_lowercase();
     let definitions = ToolEngine::get_tool_definitions();
-
-    let priority_names: Vec<&str> = if text.contains("tarjeta")
-        || text.contains("adaptador")
-        || text.contains("red")
-        || text.contains("ip")
-        || text.contains("dns")
-        || text.contains("gateway")
-        || text.contains("wifi")
-    {
-        vec![
-            "get_network_adapters",
-            "get_local_ip",
-            "get_default_gateway",
-            "get_dns_servers",
-            "get_wifi_info",
-            "run_network_diagnostic",
-            "get_public_ip",
-            "ping_host",
-            "dns_lookup",
-            "traceroute_host",
-            "test_tcp_port",
-            "get_network_usage",
-        ]
-    } else if text.contains("proceso")
-        || text.contains("cpu")
-        || text.contains("memoria")
-        || text.contains("rendimiento")
-        || text.contains("lento")
-    {
-        vec![
-            "list_processes",
-            "get_top_processes",
-            "find_high_cpu_processes",
-            "find_high_memory_processes",
-            "get_process_detail",
-            "get_cpu_usage",
-            "get_memory_usage",
-            "get_disk_usage",
-            "get_system_info",
-        ]
-    } else if text.contains("servicio") || text.contains("service") {
-        vec![
-            "list_running_services",
-            "list_services",
-            "get_service_status",
-            "restart_service",
-            "start_service",
-            "stop_service",
-        ]
-    } else {
-        vec![
-            "get_system_info",
-            "list_processes",
-            "run_network_diagnostic",
-            "get_network_adapters",
-            "get_local_ip",
-            "get_dns_servers",
-            "list_running_services",
-            "generate_support_report",
-        ]
-    };
+    let priority_names = specialty_agent::preferred_tools_for_message(last_user_message);
 
     let mut selected: Vec<crate::tools::ToolDefinition> = Vec::new();
 
@@ -408,17 +349,37 @@ pub async fn function_calling_loop(
                     continue;
                 }
                 let result = ToolEngine::execute(app, name, &args, settings.user_role).await;
+                let tool_message_content = if result.success {
+                    result.output.clone()
+                } else {
+                    result
+                        .error
+                        .clone()
+                        .unwrap_or_else(|| "Error desconocido".to_string())
+                };
 
                 // Agregar resultado al historial
                 messages.push(ChatMessage {
                     role: MessageRole::Tool,
-                    content: if result.success {
-                        result.output
-                    } else {
-                        result
-                            .error
-                            .unwrap_or_else(|| "Error desconocido".to_string())
-                    },
+                    content: tool_message_content,
+                    reasoning_content: None,
+                    tool_call_id: call.id.clone(),
+                    tool_calls: None,
+                });
+
+                let verification = tool_verifier::verify_tool_execution(
+                    app,
+                    name,
+                    &args,
+                    &result,
+                    settings,
+                )
+                .await;
+                let verification_message =
+                    tool_verifier::format_verification_message(name, &verification);
+                messages.push(ChatMessage {
+                    role: MessageRole::Tool,
+                    content: verification_message,
                     reasoning_content: None,
                     tool_call_id: call.id.clone(),
                     tool_calls: None,
@@ -640,6 +601,14 @@ pub async fn stream_function_calling_loop(
                     continue;
                 }
                 let result = ToolEngine::execute(app, &name, &args, settings.user_role).await;
+                let tool_message_content = if result.success {
+                    result.output.clone()
+                } else {
+                    result
+                        .error
+                        .clone()
+                        .unwrap_or_else(|| "Error desconocido".to_string())
+                };
 
                 tools_used.push(ToolInfo {
                     name: name.clone(),
@@ -660,15 +629,33 @@ pub async fn stream_function_calling_loop(
                 // Agregar resultado al historial
                 messages.push(ChatMessage {
                     role: MessageRole::Tool,
-                    content: if result.success {
-                        result.output
-                    } else {
-                        result
-                            .error
-                            .unwrap_or_else(|| "Error desconocido".to_string())
-                    },
+                    content: tool_message_content,
                     reasoning_content: None,
                     tool_call_id: call.id,
+                    tool_calls: None,
+                });
+
+                let verification = tool_verifier::verify_tool_execution(
+                    app,
+                    &name,
+                    &args,
+                    &result,
+                    settings,
+                )
+                .await;
+                let verification_message =
+                    tool_verifier::format_verification_message(&name, &verification);
+                on_update(StreamUpdate {
+                    update_type: "text".to_string(),
+                    content: format!("\n{}\n", verification_message),
+                    tool_name: None,
+                    tool_result: None,
+                });
+                messages.push(ChatMessage {
+                    role: MessageRole::Tool,
+                    content: verification_message,
+                    reasoning_content: None,
+                    tool_call_id: None,
                     tool_calls: None,
                 });
             }

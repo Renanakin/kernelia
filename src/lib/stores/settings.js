@@ -9,6 +9,10 @@ export const settingsOpen = writable(false);
 export const auditOpen = writable(false);
 export const sidebarTab = writable('telemetry');
 export const theme = writable('dark');
+export const ragEngineEnabled = writable(true);
+export const ragCompareMode = writable(false);
+export const ragDebugPanel = writable(false);
+export const ragShowConfidenceBadge = writable(true);
 
 export const selectedModel = derived(
   [models, selectedModelId],
@@ -27,6 +31,10 @@ export async function loadSettings() {
     userRole.set(s.user_role);
     isFirstRun.set(s.first_run);
     theme.set(s.theme);
+    ragEngineEnabled.set(s.rag_engine_enabled);
+    ragCompareMode.set(s.rag_compare_mode);
+    ragDebugPanel.set(s.rag_debug_panel);
+    ragShowConfidenceBadge.set(s.rag_show_confidence_badge);
 
     const modelList = await getModels();
     models.set(modelList);
@@ -46,6 +54,10 @@ export async function saveSettings(updates) {
     if (updates.selected_model) selectedModelId.set(updates.selected_model);
     if (updates.user_role) userRole.set(updates.user_role);
     if (updates.theme) theme.set(updates.theme);
+    if (typeof updates.rag_engine_enabled === 'boolean') ragEngineEnabled.set(updates.rag_engine_enabled);
+    if (typeof updates.rag_compare_mode === 'boolean') ragCompareMode.set(updates.rag_compare_mode);
+    if (typeof updates.rag_debug_panel === 'boolean') ragDebugPanel.set(updates.rag_debug_panel);
+    if (typeof updates.rag_show_confidence_badge === 'boolean') ragShowConfidenceBadge.set(updates.rag_show_confidence_badge);
 
     return true;
   } catch (e) {

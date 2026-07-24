@@ -11,7 +11,7 @@ function isMockLikeResponse(payload) {
 export async function POST({ request, fetch }) {
   try {
     const body = await request.json();
-    const model = body?.model || 'gemma3';
+    const model = body?.model || 'gemma:2b';
     const messages = Array.isArray(body?.messages) ? body.messages : [];
     const temperature = typeof body?.temperature === 'number' ? body.temperature : 0.6;
     const maxTokens = typeof body?.max_tokens === 'number' ? body.max_tokens : 500;

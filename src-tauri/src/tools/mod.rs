@@ -23,6 +23,7 @@ pub mod scheduler;
 pub mod security;
 pub mod sysinfo_tool;
 pub mod terminal;
+pub mod powershell;
 pub mod windows_services;
 
 use serde::{Deserialize, Serialize};

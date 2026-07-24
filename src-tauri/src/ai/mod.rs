@@ -1,8 +1,20 @@
 pub mod client;
+pub mod command_retriever;
+pub mod confidence_engine;
 pub mod function_calling;
 pub mod intent_engine;
+pub mod knowledge_retriever;
+pub mod live_state_retriever;
+pub mod memory_engine;
 pub mod models;
+pub mod prompt_context_builder;
+pub mod query_analyzer;
 pub mod router;
+pub mod specialty_agent;
+pub mod specialty_router;
+pub mod tool_verifier;
+pub mod trace_engine;
+pub mod decision_engine;
 
 pub use models::ChatMessage;
 pub use router::AiRouter;

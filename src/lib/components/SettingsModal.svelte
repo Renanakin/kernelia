@@ -1,7 +1,16 @@
 ﻿<script>
   import { setApiKey } from '$lib/api/runtime/client.js';
   import { invokeWithPolicy } from '$lib/utils/invoke.js';
-  import { models, settingsOpen, userRole, saveSettings } from '$lib/stores/settings.js';
+  import {
+    models,
+    settingsOpen,
+    userRole,
+    ragEngineEnabled,
+    ragCompareMode,
+    ragDebugPanel,
+    ragShowConfidenceBadge,
+    saveSettings
+  } from '$lib/stores/settings.js';
 
   let apiKeys = $state({});
   let saving = $state({});
@@ -17,6 +26,10 @@
 
   async function handleRoleChange(newRole) {
     await saveSettings({ user_role: newRole });
+  }
+
+  async function toggleSetting(key, value) {
+    await saveSettings({ [key]: value });
   }
 
   async function refreshMegabossStatus() {
@@ -112,6 +125,45 @@
                 {role}
               </button>
             {/each}
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <h3 class="text-sm font-semibold text-[var(--color-text-main)] mb-1">Rollout RAG</h3>
+          <p class="text-xs text-[var(--color-text-dim)] mb-3">Controla la activacion gradual del nuevo nucleo y el panel interno de QA.</p>
+
+          <div class="space-y-3">
+            <label class="flex items-center justify-between gap-4 bg-[var(--color-bg-input)] rounded-xl p-4 border border-[var(--glass-border)]">
+              <div>
+                <div class="text-sm text-[var(--color-text-main)]">Activar motor RAG nuevo</div>
+                <div class="text-xs text-[var(--color-text-dim)]">Si se desactiva, el chat sigue con el flujo operativo base sin contexto RAG gobernado.</div>
+              </div>
+              <input type="checkbox" checked={$ragEngineEnabled} onchange={(e) => toggleSetting('rag_engine_enabled', e.currentTarget.checked)} />
+            </label>
+
+            <label class="flex items-center justify-between gap-4 bg-[var(--color-bg-input)] rounded-xl p-4 border border-[var(--glass-border)]">
+              <div>
+                <div class="text-sm text-[var(--color-text-main)]">Modo comparativo QA</div>
+                <div class="text-xs text-[var(--color-text-dim)]">Muestra comparacion entre la lectura legacy de intencion y la decision del RAG nuevo.</div>
+              </div>
+              <input type="checkbox" checked={$ragCompareMode} onchange={(e) => toggleSetting('rag_compare_mode', e.currentTarget.checked)} />
+            </label>
+
+            <label class="flex items-center justify-between gap-4 bg-[var(--color-bg-input)] rounded-xl p-4 border border-[var(--glass-border)]">
+              <div>
+                <div class="text-sm text-[var(--color-text-main)]">Panel interno de debug</div>
+                <div class="text-xs text-[var(--color-text-dim)]">Expone especialidad, confianza, decision, trace y conflictos para revision tecnica.</div>
+              </div>
+              <input type="checkbox" checked={$ragDebugPanel} onchange={(e) => toggleSetting('rag_debug_panel', e.currentTarget.checked)} />
+            </label>
+
+            <label class="flex items-center justify-between gap-4 bg-[var(--color-bg-input)] rounded-xl p-4 border border-[var(--glass-border)]">
+              <div>
+                <div class="text-sm text-[var(--color-text-main)]">Mostrar badges de confianza</div>
+                <div class="text-xs text-[var(--color-text-dim)]">Hace visible la especialidad y la confianza del RAG cuando la respuesta venga del flujo gobernado.</div>
+              </div>
+              <input type="checkbox" checked={$ragShowConfidenceBadge} onchange={(e) => toggleSetting('rag_show_confidence_badge', e.currentTarget.checked)} />
+            </label>
           </div>
         </div>
 

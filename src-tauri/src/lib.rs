@@ -2,6 +2,7 @@ mod ai;
 mod commands;
 mod config;
 mod core;
+mod rag;
 mod tools;
 
 use ai::AiRouter;
