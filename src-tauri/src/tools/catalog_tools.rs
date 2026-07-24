@@ -1585,3 +1585,43 @@ pub fn get_tool_policy(tool_name: &str) -> Option<ToolPolicy> {
         .into_iter()
         .find(|p| p.name == tool_name)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    fn assert_read_only_result(tool_name: &str, result: ToolResult) {
+        println!("[{}] success={}", tool_name, result.success);
+        if let Some(err) = &result.error {
+            println!("[{}] error={}", tool_name, err);
+        }
+        println!("[{}] output={}", tool_name, result.output);
+
+        assert_eq!(result.tool_name, tool_name);
+        assert!(result.success, "{} falló: {:?}", tool_name, result.error);
+        assert!(
+            !result.output.trim().is_empty(),
+            "{} devolvió salida vacía",
+            tool_name
+        );
+    }
+
+    #[tokio::test]
+    async fn round_network_state_is_read_only() {
+        let result = execute_catalog_tool("get_network_usage", &json!({})).await;
+        assert_read_only_result("get_network_usage", result);
+    }
+
+    #[tokio::test]
+    async fn round_windows_update_status_is_read_only() {
+        let result = execute_catalog_tool("get_windows_updates_status", &json!({})).await;
+        assert_read_only_result("get_windows_updates_status", result);
+    }
+
+    #[tokio::test]
+    async fn round_app_update_status_is_read_only() {
+        let result = execute_catalog_tool("check_app_updates", &json!({})).await;
+        assert_read_only_result("check_app_updates", result);
+    }
+}

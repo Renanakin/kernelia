@@ -126,6 +126,14 @@ pub struct AppSettings {
     pub version: String,
     pub first_run: bool,
     pub selected_model: String,
+    #[serde(default = "AppSettings::default_rag_engine_enabled")]
+    pub rag_engine_enabled: bool,
+    #[serde(default = "AppSettings::default_rag_compare_mode")]
+    pub rag_compare_mode: bool,
+    #[serde(default = "AppSettings::default_rag_debug_panel")]
+    pub rag_debug_panel: bool,
+    #[serde(default = "AppSettings::default_rag_show_confidence_badge")]
+    pub rag_show_confidence_badge: bool,
     pub models: Vec<ModelConfig>,
     pub ollama: OllamaConfig,
     pub language: String,
@@ -151,6 +159,10 @@ impl Default for AppSettings {
             version: env!("CARGO_PKG_VERSION").to_string(),
             first_run: true,
             selected_model: "gemma3-local".to_string(),
+            rag_engine_enabled: Self::default_rag_engine_enabled(),
+            rag_compare_mode: Self::default_rag_compare_mode(),
+            rag_debug_panel: Self::default_rag_debug_panel(),
+            rag_show_confidence_badge: Self::default_rag_show_confidence_badge(),
             models: Self::default_models(),
             ollama: OllamaConfig::default(),
             language: "es".to_string(),
@@ -169,6 +181,31 @@ impl Default for AppSettings {
 }
 
 impl AppSettings {
+    fn default_rag_engine_enabled() -> bool {
+        std::env::var("KERNELIA_RAG_ENABLED")
+            .ok()
+            .map(|value| matches!(value.to_lowercase().as_str(), "1" | "true" | "yes" | "on"))
+            .unwrap_or(true)
+    }
+
+    fn default_rag_compare_mode() -> bool {
+        std::env::var("KERNELIA_RAG_COMPARE_MODE")
+            .ok()
+            .map(|value| matches!(value.to_lowercase().as_str(), "1" | "true" | "yes" | "on"))
+            .unwrap_or(false)
+    }
+
+    fn default_rag_debug_panel() -> bool {
+        std::env::var("KERNELIA_RAG_DEBUG_PANEL")
+            .ok()
+            .map(|value| matches!(value.to_lowercase().as_str(), "1" | "true" | "yes" | "on"))
+            .unwrap_or(false)
+    }
+
+    fn default_rag_show_confidence_badge() -> bool {
+        true
+    }
+
     fn default_gemma3_base_url() -> String {
         std::env::var("KERNELIA_GEMMA3_BASE_URL")
             .ok()
@@ -190,7 +227,7 @@ impl AppSettings {
                     provider: "docker-model-runner".into(),
                     base_url: Self::default_gemma3_base_url(),
                     api_key: None,
-                    model_name: "gemma3".into(),
+                    model_name: "gemma:2b".into(),
                     supports_function_calling: true,
                     is_local: true,
                     max_tokens: 500,
@@ -244,10 +281,9 @@ impl AppSettings {
     fn migrate_legacy_model_runner_urls(&mut self) -> bool {
         let mut changed = false;
         for model in &mut self.models {
-            if model.base_url.contains("localhost:12434")
-                || model.base_url.contains("localhost:21434")
+            if model.base_url.contains("localhost:21434")
+                || model.base_url.contains("localhost:11435")
             {
-                model.base_url = model.base_url.replace("localhost:12434", "localhost:21434");
                 model.base_url = model.base_url.replace("localhost:21434", "localhost:11435");
                 changed = true;
             }
@@ -257,8 +293,8 @@ impl AppSettings {
                 model.base_url = model.base_url.replace("/engines/llama.cpp/v1", "/v1");
                 changed = true;
             }
-            if model.id == "gemma3-local" && model.model_name != "gemma3" {
-                model.model_name = "gemma3".to_string();
+            if model.id == "gemma3-local" && model.model_name != "gemma:2b" {
+                model.model_name = "gemma:2b".to_string();
                 changed = true;
             }
         }
@@ -588,7 +624,7 @@ impl AppSettings {
             if g3.base_url.trim().is_empty() {
                 g3.base_url = Self::default_gemma3_base_url();
             }
-            g3.model_name = "gemma3".into();
+            g3.model_name = "gemma:2b".into();
             g3.name = "Gemma 3 Local (Docker)".into();
             g3.is_local = true;
             g3.supports_function_calling = true;
@@ -602,7 +638,7 @@ impl AppSettings {
                     provider: "docker-model-runner".into(),
                     base_url: Self::default_gemma3_base_url(),
                     api_key: None,
-                    model_name: "gemma3".into(),
+                model_name: "gemma:2b".into(),
                     supports_function_calling: true,
                     is_local: true,
                     max_tokens: 500,
@@ -1252,7 +1288,7 @@ impl AppSettings {
                 provider: "docker-model-runner".into(),
                 base_url: "http://localhost:11435/v1".into(),
                 api_key: None,
-                model_name: "gemma3".into(),
+                model_name: "gemma:2b".into(),
                 supports_function_calling: true,
                 is_local: true,
                 max_tokens: 500,

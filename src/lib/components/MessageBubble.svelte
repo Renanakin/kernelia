@@ -1,6 +1,6 @@
 <script>
   import { renderMarkdown } from '$lib/utils/markdown.js';
-  import { formatToolName, summarizeToolArgs } from '$lib/utils/formatting.js';
+  import { formatToolName } from '$lib/utils/formatting.js';
 
   let { message } = $props();
 
@@ -8,6 +8,14 @@
   const isSystem = $derived(message.role === 'system');
   const hasTools = $derived(message.toolsUsed && message.toolsUsed.length > 0);
   const hasError = $derived(!!message.error);
+  const ragContext = $derived(message.ragContext || null);
+  const ragComparison = $derived(message.ragComparison || null);
+  const showRagBadge = $derived(
+    !!ragContext && ragContext.enabled && ragContext.show_summary_badge && !isUser && !isSystem
+  );
+  const showRagDebug = $derived(
+    !!ragContext && ragContext.debug_panel_enabled && !isUser && !isSystem
+  );
 </script>
 
 <div class="flex flex-col {isUser ? 'items-end' : 'items-start'} group w-full mb-8">
@@ -26,6 +34,26 @@
         ? 'bg-transparent text-gray-500 font-mono text-xs w-full text-center'
         : 'bg-transparent text-gray-200'}"
   >
+    {#if showRagBadge}
+      <div class="flex flex-wrap gap-2 mb-3">
+        {#if ragContext.specialty}
+          <span class="px-2 py-1 rounded-full bg-cyan-500/10 border border-cyan-400/20 text-[10px] font-mono uppercase tracking-wider text-cyan-300">
+            {ragContext.specialty}
+          </span>
+        {/if}
+        {#if ragContext.confidence_level}
+          <span class="px-2 py-1 rounded-full bg-emerald-500/10 border border-emerald-400/20 text-[10px] font-mono uppercase tracking-wider text-emerald-300">
+            {ragContext.confidence_level} {ragContext.confidence_score ? `${Math.round(ragContext.confidence_score * 100)}%` : ''}
+          </span>
+        {/if}
+        {#if ragContext.decision_mode}
+          <span class="px-2 py-1 rounded-full bg-amber-500/10 border border-amber-400/20 text-[10px] font-mono uppercase tracking-wider text-amber-300">
+            {ragContext.decision_mode}
+          </span>
+        {/if}
+      </div>
+    {/if}
+
     {#if message.currentTool}
       <div class="flex items-center gap-3 text-[var(--color-brand-success)] py-2 mb-2">
         <div class="relative w-4 h-4 shrink-0">
@@ -82,6 +110,74 @@
           </div>
         {/each}
       </div>
+    {/if}
+
+    {#if showRagDebug}
+      <details class="mt-4 rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+        <summary class="px-4 py-3 text-[11px] font-mono uppercase tracking-[0.18em] text-gray-300 cursor-pointer select-none">
+          QA Panel RAG
+        </summary>
+        <div class="px-4 pb-4 pt-1 space-y-3 text-xs text-gray-300">
+          <div class="grid gap-2 md:grid-cols-2">
+            <div>motor: {ragContext.enabled ? 'rag' : 'legacy'}</div>
+            <div>trace: {ragContext.trace_id || 'n/a'}</div>
+            <div>specialty: {ragContext.specialty || 'n/a'}</div>
+            <div>decision: {ragContext.decision_mode || 'n/a'}</div>
+            <div>confidence: {ragContext.confidence_level || 'n/a'}</div>
+            <div>risk: {ragContext.risk_level || 'n/a'}</div>
+          </div>
+
+          {#if ragContext.retrieval_counts?.length}
+            <div>
+              <div class="text-[10px] uppercase tracking-[0.18em] text-gray-500 mb-1">Retrieval</div>
+              <div class="flex flex-wrap gap-2">
+                {#each ragContext.retrieval_counts as item}
+                  <span class="px-2 py-1 rounded-full bg-white/5 border border-white/10 font-mono">{item}</span>
+                {/each}
+              </div>
+            </div>
+          {/if}
+
+          {#if ragContext.reason_codes?.length}
+            <div>
+              <div class="text-[10px] uppercase tracking-[0.18em] text-gray-500 mb-1">Reason Codes</div>
+              <div class="flex flex-wrap gap-2">
+                {#each ragContext.reason_codes as item}
+                  <span class="px-2 py-1 rounded-full bg-white/5 border border-white/10 font-mono">{item}</span>
+                {/each}
+              </div>
+            </div>
+          {/if}
+
+          {#if ragContext.live_conflicts?.length}
+            <div>
+              <div class="text-[10px] uppercase tracking-[0.18em] text-gray-500 mb-1">Conflicts</div>
+              <div class="flex flex-wrap gap-2">
+                {#each ragContext.live_conflicts as item}
+                  <span class="px-2 py-1 rounded-full bg-red-500/10 border border-red-400/20 text-red-300 font-mono">{item}</span>
+                {/each}
+              </div>
+            </div>
+          {/if}
+
+          {#if ragComparison}
+            <div class="border-t border-white/10 pt-3">
+              <div class="text-[10px] uppercase tracking-[0.18em] text-gray-500 mb-1">Compare Mode</div>
+              <div class="grid gap-2 md:grid-cols-2">
+                <div>legacy_intent: {ragComparison.legacy_intent}</div>
+                <div>legacy_confidence: {Math.round((ragComparison.legacy_confidence || 0) * 100)}%</div>
+                <div>rag_specialty: {ragComparison.rag_specialty}</div>
+                <div>rag_confidence: {Math.round((ragComparison.rag_confidence || 0) * 100)}%</div>
+              </div>
+              {#if ragComparison.legacy_plan?.length}
+                <div class="mt-2 text-gray-400">
+                  legacy_plan: {ragComparison.legacy_plan.join(' | ')}
+                </div>
+              {/if}
+            </div>
+          {/if}
+        </div>
+      </details>
     {/if}
 
     <div class="flex {isUser ? 'justify-end' : 'justify-start'} mt-2 opacity-0 group-hover:opacity-100 transition-opacity">

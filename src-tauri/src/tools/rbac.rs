@@ -398,3 +398,24 @@ pub fn ensure_permission(role: UserRole, tool_name: &str) -> Result<(), String> 
 pub fn is_owner_only_tool(tool_name: &str) -> bool {
     !VIEWER_TOOLS.contains(&tool_name) && !POWER_USER_TOOLS.contains(&tool_name)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn denies_sensitive_command_for_viewer_role() {
+        let result = ensure_permission(UserRole::Viewer, "disable_firewall");
+        assert!(result.is_err());
+        assert!(result
+            .err()
+            .unwrap_or_default()
+            .contains("ACCESO DENEGADO"));
+    }
+
+    #[test]
+    fn allows_safe_dns_query_for_viewer_role() {
+        let result = ensure_permission(UserRole::Viewer, "dns_lookup");
+        assert!(result.is_ok());
+    }
+}

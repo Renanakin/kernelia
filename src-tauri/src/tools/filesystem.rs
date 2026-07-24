@@ -2,6 +2,7 @@ use super::ToolResult;
 use std::fs;
 use std::io::ErrorKind;
 use std::path::PathBuf;
+use std::collections::BTreeMap;
 
 fn to_ascii_safe(input: &str) -> String {
     let mut out = String::with_capacity(input.len());
@@ -27,6 +28,38 @@ fn to_ascii_safe(input: &str) -> String {
     }
 
     out.trim().to_string()
+}
+
+fn format_bytes(size: u64) -> String {
+    if size < 1024 {
+        format!("{} B", size)
+    } else if size < 1_048_576 {
+        format!("{:.1} KB", size as f64 / 1024.0)
+    } else if size < 1_073_741_824 {
+        format!("{:.1} MB", size as f64 / 1_048_576.0)
+    } else {
+        format!("{:.1} GB", size as f64 / 1_073_741_824.0)
+    }
+}
+
+fn classify_file_type(path: &std::path::Path) -> String {
+    path.extension()
+        .and_then(|ext| ext.to_str())
+        .map(|ext| ext.to_lowercase())
+        .filter(|ext| !ext.is_empty())
+        .unwrap_or_else(|| "sin_extension".to_string())
+}
+
+fn build_type_summary(type_counts: &BTreeMap<String, u32>) -> Vec<String> {
+    if type_counts.is_empty() {
+        return vec!["- sin archivos regulares para clasificar".to_string()];
+    }
+
+    let mut lines = Vec::new();
+    for (file_type, count) in type_counts {
+        lines.push(format!("- {}: {} archivos", file_type, count));
+    }
+    lines
 }
 
 fn resolve_path(input: &str) -> PathBuf {
@@ -208,10 +241,12 @@ pub fn list_directory(path: &str) -> ToolResult {
             let mut items: Vec<String> = Vec::new();
             let mut file_count = 0u32;
             let mut dir_count = 0u32;
+            let mut type_counts: BTreeMap<String, u32> = BTreeMap::new();
 
             for entry in entries.flatten() {
                 let raw_name = entry.file_name().to_string_lossy().to_string();
                 let name = to_ascii_safe(&raw_name);
+                let path = entry.path();
                 let metadata = entry.metadata();
 
                 let (type_indicator, size_str) = if let Ok(meta) = &metadata {
@@ -220,16 +255,9 @@ pub fn list_directory(path: &str) -> ToolResult {
                         ("[DIR]", String::new())
                     } else {
                         file_count += 1;
-                        let size = meta.len();
-                        let size_formatted = if size < 1024 {
-                            format!("{} B", size)
-                        } else if size < 1_048_576 {
-                            format!("{:.1} KB", size as f64 / 1024.0)
-                        } else if size < 1_073_741_824 {
-                            format!("{:.1} MB", size as f64 / 1_048_576.0)
-                        } else {
-                            format!("{:.1} GB", size as f64 / 1_073_741_824.0)
-                        };
+                        let size_formatted = format_bytes(meta.len());
+                        let file_type = classify_file_type(&path);
+                        *type_counts.entry(file_type).or_insert(0) += 1;
                         ("[FILE]", format!("  ({})", size_formatted))
                     }
                 } else {
@@ -242,6 +270,16 @@ pub fn list_directory(path: &str) -> ToolResult {
             items.sort();
             let summary = format!("\n--- {} files, {} directories ---", file_count, dir_count);
             items.push(summary);
+
+            let mut type_summary = vec![
+                "\n--- Tipos de archivo detectados ---".to_string(),
+                format!(
+                    "Total de tipos distintos: {}",
+                    type_counts.len()
+                ),
+            ];
+            type_summary.extend(build_type_summary(&type_counts));
+            items.extend(type_summary);
 
             ToolResult {
                 tool_name: "list_directory".to_string(),
@@ -264,5 +302,47 @@ pub fn list_directory(path: &str) -> ToolResult {
                 _ => format!("Error reading directory '{}': {}", dir_path.display(), e),
             }),
         },
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+
+    fn unique_temp_dir(name: &str) -> PathBuf {
+        let mut dir = std::env::temp_dir();
+        dir.push(format!(
+            "kernelia_{}_{}",
+            name,
+            uuid::Uuid::new_v4().simple()
+        ));
+        dir
+    }
+
+    #[test]
+    fn lists_directory_and_groups_file_types() {
+        let dir = unique_temp_dir("desktop_types");
+        fs::create_dir_all(&dir).expect("temp dir");
+        fs::write(dir.join("uno.txt"), "a").expect("txt file");
+        fs::write(dir.join("dos.PDF"), "b").expect("pdf file");
+        fs::write(dir.join("sin_extension"), "c").expect("file without extension");
+        fs::create_dir_all(dir.join("carpeta")).expect("folder");
+
+        let result = list_directory(dir.to_string_lossy().as_ref());
+        assert!(result.success);
+        assert!(result.output.contains("Tipos de archivo detectados"));
+        assert!(result.output.contains("txt: 1 archivos"));
+        assert!(result.output.contains("pdf: 1 archivos"));
+        assert!(result.output.contains("sin_extension: 1 archivos"));
+        assert!(result.output.contains("[DIR] carpeta"));
+    }
+
+    #[test]
+    fn recognizes_desktop_aliases() {
+        let desktop = resolve_path("desktop");
+        let _ = desktop;
+        assert_eq!(resolve_path("desktop").file_name().is_some(), true);
+        assert_eq!(resolve_path("escritorio").file_name().is_some(), true);
     }
 }

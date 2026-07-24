@@ -10,12 +10,40 @@ import { writable, derived } from 'svelte/store';
  * @property {string} [model]
  * @property {string} [error]
  * @property {boolean} [isLoading]
+ * @property {RagContext} [ragContext]
+ * @property {RagComparison} [ragComparison]
  */
 
 /**
  * @typedef {Object} ToolUse
  * @property {string} name
  * @property {string} arguments
+ */
+
+/**
+ * @typedef {Object} RagContext
+ * @property {boolean} enabled
+ * @property {string | null} [specialty]
+ * @property {string | null} [confidence_level]
+ * @property {number | null} [confidence_score]
+ * @property {string | null} [decision_mode]
+ * @property {string | null} [risk_level]
+ * @property {string | null} [trace_id]
+ * @property {boolean} [show_summary_badge]
+ * @property {boolean} [debug_panel_enabled]
+ * @property {string[]} [retrieval_counts]
+ * @property {string[]} [reason_codes]
+ * @property {string[]} [live_conflicts]
+ */
+
+/**
+ * @typedef {Object} RagComparison
+ * @property {string} legacy_intent
+ * @property {number} legacy_confidence
+ * @property {string[]} legacy_plan
+ * @property {string} rag_specialty
+ * @property {string} rag_decision
+ * @property {number} rag_confidence
  */
 
 /** @type {import('svelte/store').Writable<Message[]>} */
@@ -82,8 +110,10 @@ export function addLoadingMessage() {
  * @param {Array<ToolUse>} [toolsUsed]
  * @param {string} [model]
  * @param {string} [error]
+ * @param {RagContext} [ragContext]
+ * @param {RagComparison} [ragComparison]
  */
-export function resolveLoadingMessage(loadingId, content, toolsUsed, model, error) {
+export function resolveLoadingMessage(loadingId, content, toolsUsed, model, error, ragContext, ragComparison) {
   messages.update((msgs) =>
     msgs.map((msg) =>
       msg.id === loadingId
@@ -93,6 +123,8 @@ export function resolveLoadingMessage(loadingId, content, toolsUsed, model, erro
             toolsUsed: toolsUsed || [],
             model,
             error,
+            ragContext,
+            ragComparison,
             isLoading: false,
           }
         : msg

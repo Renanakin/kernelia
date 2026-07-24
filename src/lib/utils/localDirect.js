@@ -11,17 +11,337 @@ const DEFAULT_USERS = [
   { username: 'tecnico', password: 'KernelIA!Tech2026', profile: 'tecnico' },
 ];
 
+function normalizeText(value) {
+  return String(value || '')
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function containsAny(text, needles) {
+  return needles.some((needle) => text.includes(needle));
+}
+
+function safeJsonParse(value, fallback = null) {
+  if (typeof value !== 'string') return fallback;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return fallback;
+  }
+}
+
+function readBrowserSnapshot() {
+  const snapshot = {
+    source: 'browser-direct',
+    user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : 'n/a',
+    platform: typeof navigator !== 'undefined' ? navigator.platform : 'n/a',
+    language: typeof navigator !== 'undefined' ? navigator.language : 'n/a',
+    online: typeof navigator !== 'undefined' ? navigator.onLine : true,
+    screen:
+      typeof screen !== 'undefined'
+        ? `${screen.width}x${screen.height}`
+        : 'n/a',
+    viewport:
+      typeof window !== 'undefined'
+        ? `${window.innerWidth || 0}x${window.innerHeight || 0}`
+        : 'n/a',
+    disks: [],
+  };
+
+  if (typeof performance !== 'undefined' && performance.memory) {
+    snapshot.memory = {
+      used_js_heap_size: performance.memory.usedJSHeapSize || 0,
+      total_js_heap_size: performance.memory.totalJSHeapSize || 0,
+      js_heap_size_limit: performance.memory.jsHeapSizeLimit || 0,
+    };
+  }
+
+  return snapshot;
+}
+
+function isSupportIntent(text) {
+  return containsAny(text, [
+    'estado actual del equipo',
+    'estado del equipo',
+    'estado del sistema',
+    'health completo',
+    'salud completa',
+    'salud del equipo',
+    'salud del sistema',
+    'no tengo internet',
+    'sin internet',
+    'red',
+    'internet',
+    'ip del equipo',
+    'cual es la ip',
+    'cual es la ip del equipo',
+    'direccion ip',
+    'ip local',
+    'dns',
+    'wifi',
+    'latencia',
+    'procesos',
+    'recursos',
+    'disco',
+    'discos',
+    'almacenamiento',
+    'archivos',
+    'escritorio',
+    'actualizaciones',
+    'winget',
+    'reporte tecnico',
+    'soporte',
+  ]);
+}
+
+function formatSystemInfoSummary(info) {
+  const cpu = info?.cpu_usage ?? 'n/a';
+  const memoryUsed = info?.memory_used ?? 0;
+  const memoryTotal = info?.memory_total ?? 0;
+  const disks = Array.isArray(info?.disks) ? info.disks : [];
+  const browserNote = info?.source === 'browser-direct'
+    ? 'Modo web: sin acceso directo al sistema operativo.'
+    : 'Acceso local disponible.';
+
+  return `**Estado detectado**
+
+- CPU: ${cpu}
+- Memoria: ${memoryUsed} / ${memoryTotal}
+- Discos visibles: ${disks.length}
+- ${browserNote}
+
+**Recomendacion**
+
+Abre KernelIA con runtime Tauri si necesitas datos reales del sistema.`;
+}
+
+function formatNetworkSummary(data) {
+  const connectivity = data?.connectivity?.google_ping?.latency || 'n/a';
+  const status = data?.status || 'n/a';
+  return `**Estado de red**
+
+- Salud general: ${status}
+- Ping Google: ${connectivity}
+
+**Recomendacion**
+
+Si la latencia sube o falla DNS, revisa gateway y adaptador.`;
+}
+
+function formatProcessesSummary(raw) {
+  const processes = safeJsonParse(raw, []);
+  const count = Array.isArray(processes) ? processes.length : 0;
+  const top = Array.isArray(processes) && processes.length > 0 ? processes[0] : null;
+
+  return `**Procesos detectados**
+
+- Total visible: ${count}
+- ${top ? `Proceso principal: ${top.name || top.process_name || 'n/a'}` : 'Sin lista real disponible en modo web.'}
+
+**Recomendacion**
+
+Si el equipo esta lento, revisa CPU/RAM en el runtime local.`;
+}
+
+function formatUpdatesSummary(windowsUpdateRaw, appUpdatesRaw) {
+  const windowsUpdate = safeJsonParse(windowsUpdateRaw, {});
+  const appUpdates = String(appUpdatesRaw || '').trim();
+
+  const windowsStatus = windowsUpdate?.Status ?? windowsUpdate?.status ?? 'n/a';
+  const windowsName = windowsUpdate?.Name ?? windowsUpdate?.name ?? 'wuauserv';
+
+  return `**Actualizaciones detectadas**
+
+- Windows Update (${windowsName}): ${windowsStatus}
+- ${appUpdates ? appUpdates.split('\n')[0] : 'Apps: sin datos disponibles en este modo.'}
+
+**Recomendacion**
+
+Aplica updates en ventana controlada y vuelve a validar.`;
+}
+
+function formatCombinedNetworkUpdatesSummary(networkSummary, updatesSummary) {
+  return `${networkSummary}
+
+${updatesSummary}`;
+}
+
+async function buildLocalFirstSupportResponse(message) {
+  const text = normalizeText(message);
+
+  const asksNetwork = containsAny(text, ['red', 'internet', 'dns', 'wifi', 'latencia', 'conexion']);
+  const asksUpdates = containsAny(text, ['actualizaciones', 'windows update', 'winget', 'aplicaciones', 'apps']);
+
+  if (containsAny(text, ['estado actual del equipo', 'estado del equipo', 'estado del sistema', 'health completo', 'salud completa', 'salud del equipo', 'salud del sistema'])) {
+    const sys = await tryDirectLocalCommand('get_system_info');
+    const info = typeof sys === 'string' ? safeJsonParse(sys, {}) : sys;
+    return {
+      text: formatSystemInfoSummary(info),
+      tools_used: [{ name: 'get_system_info', arguments: '{}' }],
+      model: 'kernelia-local-first',
+      error: null,
+    };
+  }
+
+  if (containsAny(text, ['cuantos discos', 'cuantos discos tiene', 'cuantas unidades', 'almacenamiento', 'disco', 'discos'])) {
+    const sys = await tryDirectLocalCommand('get_system_info');
+    const info = typeof sys === 'string' ? safeJsonParse(sys, {}) : sys;
+    const disks = Array.isArray(info?.disks) ? info.disks : [];
+    return {
+      text: [
+        'Estado de almacenamiento:',
+        '- No tengo acceso al inventario real de discos desde el navegador.',
+        `- Discos visibles en esta sesion: ${disks.length} (solo runtime web)`,
+        info?.source === 'browser-direct'
+          ? '- Modo web: solo puedo ver datos simulados del runtime actual.'
+          : '- Acceso local disponible.',
+        'Recomendacion: en runtime Tauri puedo leer los discos reales del equipo.',
+      ].join('\n'),
+      tools_used: [{ name: 'get_system_info', arguments: '{}' }],
+      model: 'kernelia-local-first',
+      error: null,
+    };
+  }
+
+  if (containsAny(text, ['ip del equipo', 'cual es la ip', 'cual es la ip del equipo', 'direccion ip', 'ip local'])) {
+    const browser = readBrowserSnapshot();
+    const hostName = typeof window !== 'undefined' && window.location ? window.location.hostname || 'n/a' : 'n/a';
+    return {
+      text: [
+        '**IP del equipo**',
+        '',
+        '- No puedo leer la IP real del equipo desde el navegador.',
+        `- Host visible en el navegador: ${hostName}`,
+        `- Estado de conexion del navegador: ${browser.online ? 'en linea' : 'sin conexion'}`,
+        '',
+        '**Recomendacion**',
+        '',
+        'Ejecuta KernelIA con runtime Tauri para obtener la IP local real del sistema.',
+      ].join('\n'),
+      tools_used: [],
+      model: 'kernelia-local-first',
+      error: null,
+    };
+  }
+
+  if (asksNetwork && asksUpdates) {
+    const net = await tryDirectLocalCommand('run_network_diagnostic');
+    const netData = typeof net === 'string' ? safeJsonParse(net, {}) : net;
+    const windowsUpdate = await tryDirectLocalCommand('get_windows_updates_status');
+    const appUpdates = await tryDirectLocalCommand('check_app_updates');
+    const updatesText = formatUpdatesSummary(windowsUpdate, appUpdates);
+    return {
+      text: formatCombinedNetworkUpdatesSummary(formatNetworkSummary(netData), updatesText),
+      tools_used: [
+        { name: 'run_network_diagnostic', arguments: '{}' },
+        { name: 'get_windows_updates_status', arguments: '{}' },
+        { name: 'check_app_updates', arguments: '{}' },
+      ],
+      model: 'kernelia-local-first',
+      error: null,
+    };
+  }
+
+  if (asksNetwork) {
+    const net = await tryDirectLocalCommand('run_network_diagnostic');
+    const data = typeof net === 'string' ? safeJsonParse(net, {}) : net;
+    return {
+      text: formatNetworkSummary(data),
+      tools_used: [{ name: 'run_network_diagnostic', arguments: '{}' }],
+      model: 'kernelia-local-first',
+      error: null,
+    };
+  }
+
+  if (containsAny(text, ['procesos', 'recursos', 'cpu', 'memoria'])) {
+    const processes = await tryDirectLocalCommand('list_processes', { sort_by: 'memory', limit: 5 });
+    return {
+      text: formatProcessesSummary(processes),
+      tools_used: [{ name: 'list_processes', arguments: JSON.stringify({ sort_by: 'memory', limit: 5 }) }],
+      model: 'kernelia-local-first',
+      error: null,
+    };
+  }
+
+  if (asksUpdates) {
+    const windowsUpdate = await tryDirectLocalCommand('get_windows_updates_status');
+    const appUpdates = await tryDirectLocalCommand('check_app_updates');
+    return {
+      text: formatUpdatesSummary(windowsUpdate, appUpdates),
+      tools_used: [
+        { name: 'get_windows_updates_status', arguments: '{}' },
+        { name: 'check_app_updates', arguments: '{}' },
+      ],
+      model: 'kernelia-local-first',
+      error: null,
+    };
+  }
+
+  if (containsAny(text, ['escritorio', 'archivos', 'carpetas'])) {
+    return {
+      text: [
+        'Inventario de archivos:',
+        '- En modo web no tengo acceso al escritorio real.',
+        '- No voy a inventar archivos ni rutas.',
+        '- Recomendacion: ejecuta KernelIA con runtime Tauri para listar el escritorio con evidencia real.',
+      ].join('\n'),
+      tools_used: [],
+      model: 'kernelia-local-first',
+      error: 'Sin acceso al sistema operativo en modo web.',
+    };
+  }
+
+  if (containsAny(text, ['reporte tecnico', 'reporte', 'soporte'])) {
+    const sys = await tryDirectLocalCommand('get_system_info');
+    const info = typeof sys === 'string' ? safeJsonParse(sys, {}) : sys;
+    const net = await tryDirectLocalCommand('run_network_diagnostic');
+    const netData = typeof net === 'string' ? safeJsonParse(net, {}) : net;
+    return {
+      text: [
+        formatSystemInfoSummary(info),
+        '',
+        formatNetworkSummary(netData),
+      ].join('\n'),
+      tools_used: [
+        { name: 'get_system_info', arguments: '{}' },
+        { name: 'run_network_diagnostic', arguments: '{}' },
+      ],
+      model: 'kernelia-local-first',
+      error: null,
+    };
+  }
+
+  if (!isSupportIntent(text)) {
+    return null;
+  }
+
+  return {
+    text: [
+      'KernelIA esta operando en modo web directo.',
+      'No tengo acceso al sistema operativo desde este navegador.',
+      'Recomendacion: usa la app con runtime Tauri para que las herramientas locales respondan con evidencia real.',
+    ].join('\n'),
+    tools_used: [],
+    model: 'kernelia-local-first',
+    error: 'Sin runtime Tauri',
+  };
+}
+
 function getSelectedModel() {
   try {
-    return localStorage.getItem(STORAGE_KEY_MODEL) || 'gemma3';
+    return localStorage.getItem(STORAGE_KEY_MODEL) || 'gemma:2b';
   } catch {
-    return 'gemma3';
+    return 'gemma:2b';
   }
 }
 
 function setSelectedModel(modelId) {
   try {
-    localStorage.setItem(STORAGE_KEY_MODEL, modelId || 'gemma3');
+    localStorage.setItem(STORAGE_KEY_MODEL, modelId || 'gemma:2b');
   } catch {
     // Ignore storage failures in private mode.
   }
@@ -70,7 +390,7 @@ function fallbackPresetResponse(message) {
     return [
       'El endpoint local esta en modo simulado (mock).',
       'No está generando inferencia real del LLM.',
-      'Accion requerida: validar proxy OpenAI localhost:11435 y backend Ollama localhost:11434.',
+      'Accion requerida: validar Docker Model Runner en localhost:11435.',
     ].join('\n');
   }
 
@@ -90,7 +410,7 @@ function fallbackPresetResponse(message) {
       'Modo local directo activo (fallback).',
       'Reporte tecnico base:',
       '- Estado: backend IA sin respuesta valida en este intento',
-      '- Accion sugerida: validar proxy OpenAI en 11435 y Ollama en 11434',
+      '- Accion sugerida: validar Docker Model Runner en 11435',
       '- Siguiente paso: repetir prueba con prompt corto ("Di OK")',
     ].join('\n');
   }
@@ -178,9 +498,18 @@ async function postChatToEndpoint(message, apiUrl, timeoutMs = LOCAL_CHAT_TIMEOU
 }
 
 async function chatCompletionsDirect(message, timeoutMs = LOCAL_CHAT_TIMEOUT_MS, retries = LOCAL_CHAT_RETRIES) {
+  const localFirst = await buildLocalFirstSupportResponse(message);
+  if (localFirst) {
+    return localFirst;
+  }
+
   try {
     return await postChatToEndpoint(message, LOCAL_API_BASE_DIRECT, timeoutMs, retries);
   } catch {
+    const localFallback = await buildLocalFirstSupportResponse(message);
+    if (localFallback) {
+      return localFallback;
+    }
     return await postChatToEndpoint(message, LOCAL_API_BASE_FALLBACK, timeoutMs, retries);
   }
 }
@@ -188,6 +517,11 @@ async function chatCompletionsDirect(message, timeoutMs = LOCAL_CHAT_TIMEOUT_MS,
 export async function tryDirectLocalCommand(command, payload = {}) {
   if (command === 'stream_message' || command === 'send_message') {
     const message = payload?.message || '';
+    const localFirst = await buildLocalFirstSupportResponse(message);
+    if (localFirst) {
+      return localFirst;
+    }
+
     try {
       return await chatCompletionsDirect(message, LOCAL_CHAT_TIMEOUT_MS, LOCAL_CHAT_RETRIES);
     } catch (error) {
@@ -195,7 +529,7 @@ export async function tryDirectLocalCommand(command, payload = {}) {
       const conciseError = errText.includes('DOCKER_MOCK_MODE')
         ? 'Docker local endpoint en modo simulado (sin inferencia real).'
         : errText.toLowerCase().includes('abort')
-          ? 'El modelo local tardó demasiado en responder; se agotó el tiempo de espera.'
+          ? 'El modelo local tardo demasiado en responder; se agoto el tiempo de espera.'
         : errText;
       return {
         text: fallbackPresetResponse(errText.includes('DOCKER_MOCK_MODE') ? 'docker_mock_mode' : message),
@@ -210,7 +544,7 @@ export async function tryDirectLocalCommand(command, payload = {}) {
     const selected = getSelectedModel();
     const auth = readAuthState();
     return {
-      selected_model: selected === 'gemma3' ? 'gemma3-local' : selected,
+      selected_model: selected === 'gemma:2b' ? 'gemma3-local' : selected,
       user_role: auth.is_authenticated ? profileToRole(auth.profile) : 'Viewer',
       first_run: false,
       theme: 'dark',
@@ -226,14 +560,14 @@ export async function tryDirectLocalCommand(command, payload = {}) {
         provider: 'ollama-openai-proxy',
         hasApiKey: true,
         isLocal: true,
-        selected: selected === 'gemma3' || selected === 'gemma3-local',
+        selected: selected === 'gemma:2b' || selected === 'gemma3-local',
       },
     ];
   }
 
   if (command === 'set_model') {
     const modelId = payload?.model_id || payload?.modelId || 'gemma3';
-    setSelectedModel(modelId === 'gemma3-local' ? 'gemma3' : modelId);
+    setSelectedModel(modelId === 'gemma3-local' ? 'gemma:2b' : modelId);
     return true;
   }
 
@@ -251,11 +585,12 @@ export async function tryDirectLocalCommand(command, payload = {}) {
 
   if (command === 'get_system_info') {
     return JSON.stringify({
-      cpu_usage: 0,
-      memory_used: 0,
-      memory_total: 1,
+      cpu_usage: typeof navigator !== 'undefined' && navigator.hardwareConcurrency ? navigator.hardwareConcurrency : 0,
+      memory_used: typeof performance !== 'undefined' && performance.memory ? performance.memory.usedJSHeapSize : 0,
+      memory_total: typeof performance !== 'undefined' && performance.memory ? performance.memory.totalJSHeapSize : 1,
       disks: [],
-      source: 'local-direct-stub',
+      browser: readBrowserSnapshot(),
+      source: 'browser-direct',
     });
   }
 
@@ -266,14 +601,61 @@ export async function tryDirectLocalCommand(command, payload = {}) {
   if (command === 'run_network_diagnostic') {
     return JSON.stringify({
       connectivity: {
-        google_ping: { latency: 'n/a' },
+        google_ping: { latency: typeof navigator !== 'undefined' ? (navigator.onLine ? 'online' : 'offline') : 'n/a' },
       },
-      source: 'local-direct-stub',
+      status: typeof navigator !== 'undefined' ? (navigator.onLine ? 'operativa' : 'sin_conexion') : 'n/a',
+      source: 'browser-direct',
     });
   }
 
   if (command === 'list_running_services') {
     return JSON.stringify([]);
+  }
+
+  if (command === 'get_storage_summary') {
+    return JSON.stringify({
+      source: 'browser-direct',
+      disks: [],
+      summary: 'No hay acceso al inventario real de discos en modo web.',
+      browser: readBrowserSnapshot(),
+    });
+  }
+
+  if (command === 'health_summary') {
+    return 'Health del equipo: no disponible en modo web directo.\nRecomendacion: usa runtime Tauri para diagnostico real del sistema.';
+  }
+
+  if (command === 'get_windows_updates_status') {
+    return JSON.stringify({
+      Name: 'wuauserv',
+      Status: 'unknown',
+      StartType: 'unknown',
+      source: 'browser-direct',
+    });
+  }
+
+  if (command === 'check_app_updates') {
+    return [
+      'Modo web directo',
+      'No hay acceso al gestor de paquetes local desde este navegador.',
+      'Recomendacion: ejecutar KernelIA con runtime Tauri para consultar winget.',
+    ].join('\n');
+  }
+
+  if (command === 'list_directory') {
+    return JSON.stringify({
+      source: 'browser-direct',
+      path: payload?.path || 'desktop',
+      items: [],
+      note: 'No hay acceso al sistema de archivos real en modo web.',
+    });
+  }
+
+  if (command === 'get_file_info') {
+    return JSON.stringify({
+      source: 'browser-direct',
+      note: 'No hay acceso al archivo real en modo web.',
+    });
   }
 
   if (command === 'generate_support_report') {

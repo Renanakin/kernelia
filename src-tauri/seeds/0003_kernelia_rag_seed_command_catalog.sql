@@ -1,0 +1,103 @@
+INSERT INTO windows_command (
+    id, canonical_name, shell_type, command_template, description, specialty_id, area_key, risk_level,
+    is_read_only, supports_dry_run, supports_rollback, requires_admin, requires_owner, requires_megaboss,
+    expected_output_kind, created_at, updated_at
+) VALUES
+('cmd_hostname', 'hostname', 'cmd', 'hostname', 'Obtiene el hostname del equipo.', 'sp_system', 'system_identity', 'r0', 1, 0, 0, 0, 0, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_whoami', 'whoami', 'cmd', 'whoami', 'Obtiene el usuario actual.', 'sp_system', 'system_identity', 'r0', 1, 0, 0, 0, 0, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_ipconfig', 'ipconfig', 'cmd', 'ipconfig', 'Obtiene configuracion IP.', 'sp_network', 'network_config', 'r0', 1, 0, 0, 0, 0, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_ipconfig_all', 'ipconfig /all', 'cmd', 'ipconfig /all', 'Obtiene configuracion IP detallada.', 'sp_network', 'network_config', 'r0', 1, 0, 0, 0, 0, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_ipconfig_flushdns', 'ipconfig /flushdns', 'cmd', 'ipconfig /flushdns', 'Limpia cache DNS.', 'sp_network', 'network_dns', 'r1', 0, 0, 0, 0, 0, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_ipconfig_release', 'ipconfig /release', 'cmd', 'ipconfig /release', 'Libera configuracion IP.', 'sp_network', 'network_dhcp', 'r2', 0, 0, 0, 0, 0, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_ipconfig_renew', 'ipconfig /renew', 'cmd', 'ipconfig /renew', 'Renueva configuracion IP.', 'sp_network', 'network_dhcp', 'r2', 0, 0, 0, 0, 0, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_nslookup', 'nslookup', 'cmd', 'nslookup {host}', 'Consulta DNS de un host.', 'sp_network', 'network_dns', 'r0', 1, 0, 0, 0, 0, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_ping', 'ping', 'cmd', 'ping {host}', 'Prueba conectividad ICMP.', 'sp_network', 'network_connectivity', 'r0', 1, 0, 0, 0, 0, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_tracert', 'tracert', 'cmd', 'tracert {host}', 'Traza ruta de red.', 'sp_network', 'network_routing', 'r0', 1, 0, 0, 0, 0, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_netstat_an', 'netstat -an', 'cmd', 'netstat -an', 'Lista conexiones y puertos.', 'sp_security', 'network_ports', 'r0', 1, 0, 0, 0, 0, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_tasklist', 'tasklist', 'cmd', 'tasklist', 'Lista procesos activos.', 'sp_processes', 'process_inventory', 'r0', 1, 0, 0, 0, 0, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_taskkill', 'taskkill', 'cmd', 'taskkill /PID {pid} /F', 'Termina un proceso por PID.', 'sp_processes', 'process_control', 'r2', 0, 0, 0, 0, 0, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_sc_query', 'sc query', 'cmd', 'sc query {name}', 'Consulta estado de servicio.', 'sp_services', 'service_status', 'r0', 1, 0, 0, 0, 0, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_sc_start', 'sc start', 'cmd', 'sc start {name}', 'Inicia servicio.', 'sp_services', 'service_control', 'r2', 0, 0, 0, 0, 0, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_sc_stop', 'sc stop', 'cmd', 'sc stop {name}', 'Detiene servicio.', 'sp_services', 'service_control', 'r2', 0, 0, 0, 0, 0, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_sc_config_disabled', 'sc config start= disabled', 'cmd', 'sc config {name} start= disabled', 'Deshabilita servicio.', 'sp_services', 'service_control', 'r3', 0, 0, 1, 0, 0, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_sfc_scannow', 'sfc /scannow', 'cmd', 'sfc /scannow', 'Escaneo de integridad de sistema.', 'sp_maintenance', 'system_repair', 'r1', 0, 0, 0, 1, 0, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_dism_checkhealth', 'DISM /Online /Cleanup-Image /CheckHealth', 'cmd', 'DISM /Online /Cleanup-Image /CheckHealth', 'Chequeo de salud de imagen.', 'sp_maintenance', 'system_repair', 'r1', 0, 0, 0, 1, 0, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_dism_restorehealth', 'DISM /Online /Cleanup-Image /RestoreHealth', 'cmd', 'DISM /Online /Cleanup-Image /RestoreHealth', 'Reparacion de imagen.', 'sp_maintenance', 'system_repair', 'r3', 0, 0, 0, 1, 0, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_powercfg_getactive', 'powercfg /getactivescheme', 'cmd', 'powercfg /getactivescheme', 'Obtiene plan de energia activo.', 'sp_performance', 'power_plan', 'r0', 1, 0, 0, 0, 0, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_powercfg_list', 'powercfg /list', 'cmd', 'powercfg /list', 'Lista planes de energia.', 'sp_performance', 'power_plan', 'r0', 1, 0, 0, 0, 0, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_winget_upgrade', 'winget upgrade', 'cmd', 'winget upgrade', 'Lista actualizaciones de aplicaciones.', 'sp_software', 'software_updates', 'r0', 1, 0, 0, 0, 0, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_dism_getfeatures', 'DISM /Online /Get-Features /Format:Table', 'cmd', 'DISM /Online /Get-Features /Format:Table', 'Lista features de Windows.', 'sp_software', 'windows_features', 'r0', 1, 0, 0, 1, 0, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_shutdown_restart', 'shutdown /r /t 0', 'cmd', 'shutdown /r /t {delay_seconds}', 'Reinicia el sistema.', 'sp_sensitive_ops', 'system_power', 'r4', 0, 0, 0, 0, 1, 0, 'text', '2026-07-12', '2026-07-12'),
+('cmd_shutdown_poweroff', 'shutdown /s /t 0', 'cmd', 'shutdown /s /t {delay_seconds}', 'Apaga el sistema.', 'sp_sensitive_ops', 'system_power', 'r4', 0, 0, 0, 0, 1, 0, 'text', '2026-07-12', '2026-07-12')
+ON CONFLICT(id) DO NOTHING;
+
+INSERT INTO windows_command_alias (id, command_id, alias_text, alias_kind) VALUES
+('alias_hostname_1', 'cmd_hostname', 'nombre del equipo', 'natural_language'),
+('alias_hostname_2', 'cmd_hostname', 'hostname', 'technical_term'),
+('alias_whoami_1', 'cmd_whoami', 'usuario actual', 'natural_language'),
+('alias_ipconfig_1', 'cmd_ipconfig', 'configuracion de red', 'natural_language'),
+('alias_ipconfig_2', 'cmd_ipconfig_all', 'adaptadores de red', 'natural_language'),
+('alias_flushdns_1', 'cmd_ipconfig_flushdns', 'limpiar dns', 'natural_language'),
+('alias_flushdns_2', 'cmd_ipconfig_flushdns', 'flush dns', 'technical_term'),
+('alias_release_1', 'cmd_ipconfig_release', 'liberar ip', 'natural_language'),
+('alias_renew_1', 'cmd_ipconfig_renew', 'renovar ip', 'natural_language'),
+('alias_nslookup_1', 'cmd_nslookup', 'consulta dns', 'natural_language'),
+('alias_ping_1', 'cmd_ping', 'ping', 'technical_term'),
+('alias_tracert_1', 'cmd_tracert', 'traceroute', 'technical_term'),
+('alias_netstat_1', 'cmd_netstat_an', 'puertos abiertos', 'natural_language'),
+('alias_tasklist_1', 'cmd_tasklist', 'listar procesos', 'natural_language'),
+('alias_taskkill_1', 'cmd_taskkill', 'matar proceso', 'natural_language'),
+('alias_scquery_1', 'cmd_sc_query', 'estado del servicio', 'natural_language'),
+('alias_scstart_1', 'cmd_sc_start', 'iniciar servicio', 'natural_language'),
+('alias_scstop_1', 'cmd_sc_stop', 'detener servicio', 'natural_language'),
+('alias_sfc_1', 'cmd_sfc_scannow', 'revisar archivos del sistema', 'natural_language'),
+('alias_dism_1', 'cmd_dism_restorehealth', 'reparar imagen windows', 'natural_language'),
+('alias_powercfg_1', 'cmd_powercfg_getactive', 'plan de energia actual', 'natural_language'),
+('alias_winget_1', 'cmd_winget_upgrade', 'actualizaciones de apps', 'natural_language'),
+('alias_shutdown_1', 'cmd_shutdown_restart', 'reiniciar pc', 'natural_language'),
+('alias_shutdown_2', 'cmd_shutdown_poweroff', 'apagar pc', 'natural_language')
+ON CONFLICT(id) DO NOTHING;
+
+INSERT INTO tool_command_binding (id, tool_id, command_id, binding_mode, priority) VALUES
+('bind_get_hostname', 'tool_get_hostname', 'cmd_hostname', 'primary', 10),
+('bind_get_current_user', 'tool_get_current_user', 'cmd_whoami', 'primary', 10),
+('bind_get_local_ip', 'tool_get_local_ip', 'cmd_ipconfig', 'primary', 10),
+('bind_get_network_adapters', 'tool_get_network_adapters', 'cmd_ipconfig_all', 'primary', 10),
+('bind_flush_dns_cache', 'tool_flush_dns_cache', 'cmd_ipconfig_flushdns', 'primary', 10),
+('bind_release_ip_config', 'tool_release_ip_config', 'cmd_ipconfig_release', 'primary', 10),
+('bind_renew_ip_config', 'tool_renew_ip_config', 'cmd_ipconfig_renew', 'primary', 10),
+('bind_dns_lookup', 'tool_dns_lookup', 'cmd_nslookup', 'primary', 10),
+('bind_ping_host', 'tool_ping_host', 'cmd_ping', 'primary', 10),
+('bind_traceroute_host', 'tool_traceroute_host', 'cmd_tracert', 'primary', 10),
+('bind_list_open_ports', 'tool_list_open_ports', 'cmd_netstat_an', 'primary', 10),
+('bind_list_processes', 'tool_list_processes', 'cmd_tasklist', 'primary', 10),
+('bind_kill_process', 'tool_kill_process', 'cmd_taskkill', 'primary', 10),
+('bind_get_service_status', 'tool_get_service_status', 'cmd_sc_query', 'primary', 10),
+('bind_start_service', 'tool_start_service', 'cmd_sc_start', 'primary', 10),
+('bind_stop_service', 'tool_stop_service', 'cmd_sc_stop', 'primary', 10),
+('bind_scan_system_files', 'tool_scan_system_files', 'cmd_sfc_scannow', 'primary', 10),
+('bind_run_dism_health_check', 'tool_run_dism_health_check', 'cmd_dism_checkhealth', 'primary', 10),
+('bind_run_dism_restore_health', 'tool_run_dism_restore_health', 'cmd_dism_restorehealth', 'primary', 10),
+('bind_get_power_plan', 'tool_get_power_plan', 'cmd_powercfg_getactive', 'primary', 10),
+('bind_list_power_plans', 'tool_list_power_plans', 'cmd_powercfg_list', 'primary', 10),
+('bind_check_app_updates', 'tool_check_app_updates', 'cmd_winget_upgrade', 'primary', 10),
+('bind_list_windows_features', 'tool_list_windows_features', 'cmd_dism_getfeatures', 'primary', 10),
+('bind_reboot_system', 'tool_reboot_system', 'cmd_shutdown_restart', 'primary', 10),
+('bind_shutdown_system', 'tool_shutdown_system', 'cmd_shutdown_poweroff', 'primary', 10)
+ON CONFLICT(id) DO NOTHING;
+
+INSERT INTO tool_precondition (id, tool_id, rule_code, rule_description) VALUES
+('pre_flush_dns_cache', 'tool_flush_dns_cache', 'NETWORK_SPECIALTY_REQUIRED', 'Solo debe ejecutarse en contexto de red.'),
+('pre_reset_network_stack', 'tool_reset_network_stack', 'CHANGE_WINDOW_REQUIRED', 'Reset de stack requiere ventana controlada.'),
+('pre_kill_process', 'tool_kill_process', 'CRITICAL_PROCESS_PROTECTION', 'No terminar procesos criticos del sistema.'),
+('pre_disable_service', 'tool_disable_service', 'SERVICE_SAFETY_CHECK', 'Verificar si el servicio es critico antes de deshabilitar.'),
+('pre_write_file', 'tool_write_file', 'SENSITIVE_PATH_BLOCK', 'Bloquear rutas sensibles si no hay aprobacion.')
+ON CONFLICT(id) DO NOTHING;
+
+INSERT INTO tool_evidence_rule (id, tool_id, evidence_kind, evidence_description, required_before, required_after) VALUES
+('evidence_run_network_diagnostic', 'tool_run_network_diagnostic', 'diagnostic_output', 'Guardar salida del diagnostico de red.', 0, 1),
+('evidence_restart_service', 'tool_restart_service', 'service_state', 'Capturar estado del servicio antes y despues.', 1, 1),
+('evidence_run_cleanup', 'tool_run_cleanup', 'disk_recovery', 'Capturar espacio recuperable antes y despues.', 1, 1),
+('evidence_run_dism_restore_health', 'tool_run_dism_restore_health', 'repair_log', 'Guardar salida de reparacion DISM.', 1, 1),
+('evidence_disable_firewall', 'tool_disable_firewall', 'security_state', 'Capturar estado de seguridad antes y despues.', 1, 1)
+ON CONFLICT(id) DO NOTHING;
