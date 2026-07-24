@@ -36,8 +36,14 @@ desktop.ini
 
 # Logs
 *.log
+/logs/
 
 ipa groq.txt
 __pycache__/
 *.pyc
 
+# Non-essential files & archive
+/archive/
+/scratch/
+/.playwright-cli/
+/.playwright-mcp/
