@@ -118,6 +118,69 @@ pub fn repair_volume_scan_ps(drive_letter: &str) -> ToolResult {
     run_powershell_cmdlet("repair_volume_scan", &cmd)
 }
 
+// --- FASE 3: REMEDIACIÓN SEGURA Y ACCIONES CORRECTIVAS (R2) ---
+
+/// Limpieza de Caché Resolver DNS (NetworkAgent): Clear-DnsClientCache
+pub fn clear_dns_cache_ps() -> ToolResult {
+    run_powershell_cmdlet("clear_dns_cache", "Clear-DnsClientCache")
+}
+
+/// Reinicio de Adaptador de Red (NetworkAgent): Restart-NetAdapter
+pub fn restart_net_adapter_ps(adapter_name: &str) -> ToolResult {
+    let cmd = format!("Restart-NetAdapter -Name '{}' -Confirm:$false", adapter_name);
+    run_powershell_cmdlet("restart_net_adapter", &cmd)
+}
+
+/// Iniciar Servicio de Windows (ServicesAgent): Start-Service
+pub fn start_service_ps(service_name: &str) -> ToolResult {
+    let cmd = format!("Start-Service -Name '{}'", service_name);
+    run_powershell_cmdlet("start_service", &cmd)
+}
+
+/// Detener Servicio de Windows (ServicesAgent): Stop-Service
+pub fn stop_service_ps(service_name: &str) -> ToolResult {
+    let cmd = format!("Stop-Service -Name '{}'", service_name);
+    run_powershell_cmdlet("stop_service", &cmd)
+}
+
+/// Reiniciar Servicio de Windows (ServicesAgent): Restart-Service
+pub fn restart_service_ps(service_name: &str) -> ToolResult {
+    let cmd = format!("Restart-Service -Name '{}'", service_name);
+    run_powershell_cmdlet("restart_service", &cmd)
+}
+
+/// Limpieza Completa de Cola de Impresión Atascada (ServicesAgent): Purga Spooler
+pub fn clear_spooler_jobs_ps() -> ToolResult {
+    let script = "Stop-Service Spooler -ErrorAction SilentlyContinue; Remove-Item $env:SystemRoot\\System32\\spool\\PRINTERS\\* -Force -ErrorAction SilentlyContinue; Start-Service Spooler";
+    run_powershell_cmdlet("clear_spooler_jobs", script)
+}
+
+/// Terminación Segura de Procesos con Lista Blanca de Protección del Kernel (ProcessAgent)
+pub fn stop_process_safe_ps(pid: u32, process_name: &str) -> ToolResult {
+    let critical_processes = [
+        "lsass", "csrss", "services", "smss", "wininit", "svchost", "system", "idle", "explorer", "winlogon"
+    ];
+
+    let name_lower = process_name.to_lowercase();
+    if critical_processes.iter().any(|&critical| name_lower.contains(critical)) {
+        return ToolResult {
+            tool_name: "stop_process_safe".to_string(),
+            success: false,
+            output: String::new(),
+            error: Some(format!("GUARDRAIL_BLOCKED: No se permite finalizar el proceso crítico del Kernel: '{}' (PID {})", process_name, pid)),
+        };
+    }
+
+    let cmd = format!("Stop-Process -Id {} -Force", pid);
+    run_powershell_cmdlet("stop_process_safe", &cmd)
+}
+
+/// Optimización de Volumen TRIM/Defrag (FilesystemAgent): Optimize-Volume
+pub fn optimize_volume_ps(drive_letter: &str) -> ToolResult {
+    let cmd = format!("Optimize-Volume -DriveLetter {} -Verbose", drive_letter);
+    run_powershell_cmdlet("optimize_volume", &cmd)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -127,5 +190,12 @@ mod tests {
     fn executes_powershell_cmdlet_successfully() {
         let res = run_powershell_cmdlet("test_get_date", "Get-Date");
         assert!(res.success, "PowerShell Get-Date falló: {:?}", res.error);
+    }
+
+    #[test]
+    fn blocks_critical_kernel_process_termination() {
+        let res = stop_process_safe_ps(1234, "svchost.exe");
+        assert!(!res.success);
+        assert!(res.error.unwrap_or_default().contains("GUARDRAIL_BLOCKED"));
     }
 }
