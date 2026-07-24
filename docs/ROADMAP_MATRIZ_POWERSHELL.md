@@ -34,9 +34,9 @@ timeline
 - **`PerformanceAgent`**: `Get-Counter` (CPU, Memory, Disk), `Get-CimInstance Win32_OperatingSystem`.
 
 ### Hitos y Entregables
-1. [ ] Crear wrappers nativos en Rust (`src-tauri/src/tools/powershell.rs`) con ejecución `ConvertTo-Json -Compress`.
-2. [ ] Validar que la ejecución no requiera elevación de privilegios de administrador.
-3. [ ] Integrar resultados en el contexto de consulta RAG (`live_state_retriever`).
+1. [x] Crear wrappers nativos en Rust (`src-tauri/src/tools/powershell.rs`) con ejecución `ConvertTo-Json -Compress`.
+2. [x] Validar que la ejecución no requiera elevación de privilegios de administrador.
+3. [x] Integrar resultados en el contexto de consulta RAG (`live_state_retriever`).
 
 ---
 

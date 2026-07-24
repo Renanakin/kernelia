@@ -1,6 +1,6 @@
 use crate::core;
 use crate::rag::models::DomainSpecialty;
-use crate::tools::{drivers, network_diagnostic, phase2, sysinfo_tool, windows_services};
+use crate::tools::{drivers, network_diagnostic, phase2, powershell, sysinfo_tool, windows_services};
 use serde_json::{json, Value};
 
 #[derive(Debug, Clone, Default)]
@@ -62,9 +62,29 @@ fn probe_current_state(specialty: &DomainSpecialty) -> Value {
         DomainSpecialty::Network => {
             let diag = serde_json::from_str::<Value>(&network_diagnostic::run_network_diagnostic_json())
                 .unwrap_or_else(|_| json!({}));
+            let ip_config = powershell::get_net_ip_config_ps();
+            let adapters = powershell::get_net_adapter_ps();
             json!({
                 "specialty": "network",
-                "network_diagnostic": diag
+                "network_diagnostic": diag,
+                "ip_config_ps": ip_config.output,
+                "net_adapters_ps": adapters.output
+            })
+        }
+        DomainSpecialty::Processes => {
+            let top_cpu = powershell::get_top_cpu_processes_ps();
+            let top_ram = powershell::get_top_ram_processes_ps();
+            json!({
+                "specialty": "processes",
+                "top_cpu_ps": top_cpu.output,
+                "top_ram_ps": top_ram.output
+            })
+        }
+        DomainSpecialty::Performance => {
+            let counters = powershell::get_performance_counters_ps();
+            json!({
+                "specialty": "performance",
+                "counters_ps": counters.output
             })
         }
         DomainSpecialty::Services => {
@@ -99,11 +119,6 @@ fn probe_current_state(specialty: &DomainSpecialty) -> Value {
                     "error": health.error
                 }
             })
-        }
-        DomainSpecialty::Performance => build_performance_state(),
-        DomainSpecialty::Maintenance => build_performance_state(),
-        DomainSpecialty::System | DomainSpecialty::Telemetry | DomainSpecialty::Filesystem | DomainSpecialty::Software => {
-            build_performance_state()
         }
         _ => {
             let sys = serde_json::from_str::<Value>(&sysinfo_tool::get_system_info_json())
