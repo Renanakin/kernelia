@@ -51,9 +51,9 @@ timeline
 - **`ServicesAgent`**: `Get-Service` (Filtro de servicios automáticos detenidos).
 
 ### Hitos y Entregables
-1. [ ] Parser de logs de eventos de Windows (`Get-WinEvent`) estructurado en JSON.
-2. [ ] Detección automática de dispositivos en fallo con código de error PnP (ej. Código 43).
-3. [ ] Registro de evidencias de diagnóstico en el motor de trazas (`trace_engine.rs`).
+1. [x] Parser de logs de eventos de Windows (`Get-WinEvent`) estructurado en JSON.
+2. [x] Detección automática de dispositivos en fallo con código de error PnP (ej. Código 43).
+3. [x] Registro de evidencias de diagnóstico en el motor de trazas (`trace_engine.rs`).
 
 ---
 

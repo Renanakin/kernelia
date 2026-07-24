@@ -89,43 +89,60 @@ fn probe_current_state(specialty: &DomainSpecialty) -> Value {
         }
         DomainSpecialty::Services => {
             let spooler = windows_services::get_service_info("Spooler");
+            let failed_services = powershell::get_failed_services_ps();
             json!({
                 "specialty": "services",
                 "spooler": {
                     "success": spooler.success,
                     "output": spooler.output,
                     "error": spooler.error
-                }
+                },
+                "failed_services_ps": failed_services.output
             })
         }
         DomainSpecialty::Drivers => {
             let driver_issues = drivers::list_driver_issues();
+            let pnp_errors = powershell::get_pnp_device_errors_ps();
             json!({
                 "specialty": "drivers",
                 "driver_issues": {
                     "success": driver_issues.success,
                     "output": driver_issues.output,
                     "error": driver_issues.error
-                }
+                },
+                "pnp_errors_ps": pnp_errors.output
             })
         }
         DomainSpecialty::Security => {
             let health = phase2::health_summary();
+            let defender = powershell::get_defender_status_ps();
+            let system_errors = powershell::audit_system_errors_ps();
             json!({
                 "specialty": "security",
                 "health_summary": {
                     "success": health.success,
                     "output": health.output,
                     "error": health.error
-                }
+                },
+                "defender_status_ps": defender.output,
+                "system_errors_ps": system_errors.output
+            })
+        }
+        DomainSpecialty::Filesystem => {
+            let disk_health = powershell::get_physical_disk_health_ps();
+            json!({
+                "specialty": "filesystem",
+                "physical_disk_health_ps": disk_health.output
             })
         }
         _ => {
             let sys = serde_json::from_str::<Value>(&sysinfo_tool::get_system_info_json())
                 .unwrap_or_else(|_| json!({}));
+            let computer_info = powershell::get_computer_info_ps();
             json!({
-                "specialty": "generic",
-                "system": sys
+                "specialty": "general",
+                "system_info": sys,
+                "computer_info_ps": computer_info.output
             })
         }
     }

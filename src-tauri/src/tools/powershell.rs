@@ -85,6 +85,39 @@ pub fn get_performance_counters_ps() -> ToolResult {
     run_powershell_cmdlet("get_performance_counters", "(Get-Counter '\\Processor(_Total)\\% Processor Time', '\\Memory\\Available MBytes').CounterSamples | Select-Object Path, CookedValue")
 }
 
+// --- FASE 2: DIAGNÓSTICO AVANZADO E INSPECCIÓN DE ERRORES (R1) ---
+
+/// Detección de Dispositivos PnP con Error o Código 43 (DriversAgent): Get-PnpDevice Errors
+pub fn get_pnp_device_errors_ps() -> ToolResult {
+    run_powershell_cmdlet("get_pnp_device_errors", "Get-PnpDevice -Status Error,Unknown | Select-Object InstanceId, FriendlyName, Class, Status")
+}
+
+/// Inspección de Estado de Windows Defender (SecurityAgent): Get-MpComputerStatus
+pub fn get_defender_status_ps() -> ToolResult {
+    run_powershell_cmdlet("get_defender_status", "Get-MpComputerStatus | Select-Object AntivirusEnabled, RealTimeProtectionEnabled, AntivirusSignatureAge, IsTamperProtected")
+}
+
+/// Auditoría de Eventos Críticos de Sistema (SecurityAgent): Get-WinEvent Level 1,2
+pub fn audit_system_errors_ps() -> ToolResult {
+    run_powershell_cmdlet("audit_system_errors", "Get-WinEvent -FilterHashtable @{LogName='System'; Level=1,2} -MaxEvents 15 | Select-Object TimeCreated, ProviderName, Id, Message")
+}
+
+/// Diagnóstico de Salud de Discos Físicos (FilesystemAgent): Get-PhysicalDisk SMART
+pub fn get_physical_disk_health_ps() -> ToolResult {
+    run_powershell_cmdlet("get_physical_disk_health", "Get-PhysicalDisk | Select-Object DeviceId, FriendlyName, OperationalStatus, HealthStatus, MediaType, Size")
+}
+
+/// Detección de Servicios Automáticos Detenidos (ServicesAgent): Get-Service Failed
+pub fn get_failed_services_ps() -> ToolResult {
+    run_powershell_cmdlet("get_failed_services", "Get-Service | Where-Object {$_.StartType -eq 'Automatic' -and $_.Status -ne 'Running'} | Select-Object Name, DisplayName, Status")
+}
+
+/// Escaneo de Integridad de Volumen sin desmontar (FilesystemAgent): Repair-Volume -Scan
+pub fn repair_volume_scan_ps(drive_letter: &str) -> ToolResult {
+    let cmd = format!("Repair-Volume -DriveLetter {} -Scan", drive_letter);
+    run_powershell_cmdlet("repair_volume_scan", &cmd)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
