@@ -210,7 +210,7 @@ impl AppSettings {
         std::env::var("KERNELIA_GEMMA3_BASE_URL")
             .ok()
             .filter(|value| !value.trim().is_empty())
-            .unwrap_or_else(|| "http://localhost:11435/v1".to_string())
+            .unwrap_or_else(|| "http://localhost:11434/v1".to_string())
     }
 
     fn enforce_local_docker_models(&mut self) -> bool {
@@ -284,7 +284,8 @@ impl AppSettings {
             if model.base_url.contains("localhost:21434")
                 || model.base_url.contains("localhost:11435")
             {
-                model.base_url = model.base_url.replace("localhost:21434", "localhost:11435");
+                model.base_url = model.base_url.replace("localhost:21434", "localhost:11434");
+                model.base_url = model.base_url.replace("localhost:11435", "localhost:11434");
                 changed = true;
             }
             if model.provider == "docker-model-runner"

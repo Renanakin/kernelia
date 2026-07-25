@@ -4,10 +4,17 @@
   import SettingsModal from '$lib/components/SettingsModal.svelte';
   import AuditDashboard from '$lib/components/AuditDashboard.svelte';
   import { auditOpen } from '$lib/stores/settings.js';
+  import { authStatus } from '$lib/stores/auth.js';
   import { onMount } from 'svelte';
 
   let mounted = false;
   let godMode = false;
+
+  $: roleInfo = ($authStatus?.role === 'MegaBoss' || $authStatus?.role === 'Owner' || $authStatus?.profile === 'Superusuario')
+    ? { name: 'MegaBoss Admin', color: 'border-red-500/40 bg-red-500/10 text-red-400', dot: 'bg-red-500' }
+    : ($authStatus?.role === 'Admin' || $authStatus?.role === 'Operator' || $authStatus?.profile === 'Tecnico')
+    ? { name: 'Técnico TI', color: 'border-green-500/40 bg-green-500/10 text-green-400', dot: 'bg-green-400' }
+    : { name: 'Usuario Estándar', color: 'border-cyan-500/40 bg-cyan-500/10 text-cyan-400', dot: 'bg-cyan-400' };
 
   onMount(() => {
     setTimeout(() => { mounted = true; }, 100);
@@ -102,7 +109,13 @@
       <span class="font-medium tracking-wide">Kernel<span class="text-gray-400">IA</span></span>
     </div>
     
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-3">
+      <!-- Role Badge -->
+      <div class="px-3 py-1.5 text-xs font-mono rounded-full border flex items-center gap-2 backdrop-blur-md transition-colors {roleInfo.color}">
+        <div class="w-1.5 h-1.5 rounded-full animate-pulse {roleInfo.dot}"></div>
+        <span>{roleInfo.name}</span>
+      </div>
+
       <!-- God Mode Toggle -->
       <button 
         class="px-4 py-2 text-xs font-medium rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors flex items-center gap-2 z-50"

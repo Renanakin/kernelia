@@ -375,6 +375,9 @@ pub async fn create_support_user(
     common::validate_username(&username)?;
     common::validate_password(&password, "password")?;
     let mut settings = router.get_settings()?;
+    if !settings.auth.is_authenticated || settings.auth.current_profile != Some(SupportProfile::Superusuario) {
+        return Err("ACCESO_DENEGADO: Requiere perfil de Superusuario autenticado.".to_string());
+    }
     settings.create_user(&username, &password, profile)?;
     router.update_settings(settings)
 }
@@ -386,6 +389,9 @@ pub async fn delete_support_user(
 ) -> Result<(), String> {
     common::validate_username(&username)?;
     let mut settings = router.get_settings()?;
+    if !settings.auth.is_authenticated || settings.auth.current_profile != Some(SupportProfile::Superusuario) {
+        return Err("ACCESO_DENEGADO: Requiere perfil de Superusuario autenticado.".to_string());
+    }
     settings.delete_user(&username)?;
     router.update_settings(settings)
 }
