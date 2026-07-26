@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 
-const LOCAL_API_BASE = 'http://localhost:11435/v1';
+const LOCAL_API_BASE = 'http://localhost:11434/v1';
 
 function isMockLikeResponse(payload) {
   const content = payload?.choices?.[0]?.message?.content;

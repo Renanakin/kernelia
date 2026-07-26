@@ -91,3 +91,15 @@ export async function createSupportUser(username, password, profile) {
 export async function deleteSupportUser(username) {
   return invokeWithPolicy('delete_support_user', { username });
 }
+
+export async function confirmSolutionAndIngest(query, solution, specialty) {
+  return invokeWithPolicy('confirm_solution_and_ingest', { query, solution, specialty });
+}
+
+export async function createSupportTicket(query, specialty, telemetry) {
+  return invokeWithPolicy('create_support_ticket_cmd', { query, specialty, telemetry });
+}
+
+export async function listSupportTickets() {
+  return invokeWithPolicy('list_support_tickets_cmd');
+}

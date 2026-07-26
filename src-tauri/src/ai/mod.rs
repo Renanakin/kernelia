@@ -12,6 +12,7 @@ pub mod query_analyzer;
 pub mod router;
 pub mod specialty_agent;
 pub mod specialty_router;
+pub mod ticket_agent;
 pub mod tool_verifier;
 pub mod trace_engine;
 pub mod decision_engine;

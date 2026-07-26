@@ -395,3 +395,32 @@ pub async fn delete_support_user(
     settings.delete_user(&username)?;
     router.update_settings(settings)
 }
+
+#[tauri::command]
+pub async fn confirm_solution_and_ingest(
+    query: String,
+    solution: String,
+    specialty: Option<String>,
+) -> Result<String, String> {
+    common::validate_non_empty("query", &query)?;
+    common::validate_non_empty("solution", &solution)?;
+    let spec = specialty.unwrap_or_else(|| "sp_general".to_string());
+    crate::rag::auto_ingest::ingest_user_validated_solution(&query, &solution, &spec)
+}
+
+#[tauri::command]
+pub async fn create_support_ticket_cmd(
+    query: String,
+    specialty: Option<String>,
+    telemetry: Option<String>,
+) -> Result<crate::rag::models::TicketCreationResult, String> {
+    common::validate_non_empty("query", &query)?;
+    let spec = specialty.unwrap_or_else(|| "General".to_string());
+    let telem = telemetry.unwrap_or_else(|| "{}".to_string());
+    crate::ai::ticket_agent::create_support_ticket_record(&query, &spec, &telem)
+}
+
+#[tauri::command]
+pub async fn list_support_tickets_cmd() -> Result<Vec<crate::rag::models::SupportTicket>, String> {
+    crate::ai::ticket_agent::list_support_tickets_from_db()
+}

@@ -130,3 +130,44 @@ impl Default for RagConfig {
         }
     }
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct KnowledgeBaseResult {
+    pub solution_found: bool,
+    pub customer_satisfied: bool,
+    pub confidence_score: f32,
+    pub specialty: String,
+    pub source_type: String,
+    pub message: String,
+    pub recommended_actions: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum TicketPriority {
+    Alta,
+    Media,
+    Baja,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TicketCreationResult {
+    pub ticket_code: String,
+    pub priority: TicketPriority,
+    pub description: String,
+    pub customer_message: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SupportTicket {
+    pub id: String,
+    pub ticket_code: String,
+    pub title: String,
+    pub description: String,
+    pub priority: String,
+    pub status: String,
+    pub specialty: String,
+    pub customer_id: String,
+    pub telemetry_json: String,
+    pub created_at: String,
+    pub updated_at: String,
+}

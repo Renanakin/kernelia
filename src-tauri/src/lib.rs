@@ -139,6 +139,9 @@ pub fn run() {
             commands::chat::list_support_users,
             commands::chat::create_support_user,
             commands::chat::delete_support_user,
+            commands::chat::confirm_solution_and_ingest,
+            commands::chat::create_support_ticket_cmd,
+            commands::chat::list_support_tickets_cmd,
             // System commands
             commands::system::get_system_info,
             commands::system::list_processes,
