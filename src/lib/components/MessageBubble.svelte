@@ -87,8 +87,8 @@
         <span class="text-sm text-red-200/80">{message.error}</span>
       </div>
     {:else if message.content}
-      <!-- Use typography sizing based on Zen Canvas for assistant -->
-      <div class="markdown-content leading-relaxed {isUser ? 'text-sm' : 'text-lg md:text-xl font-light text-gray-200'}">
+      <!-- Clean markdown layout typography -->
+      <div class="markdown-content leading-relaxed {isUser ? 'text-sm text-slate-100' : 'text-sm md:text-base font-normal text-slate-100'}">
         {@html renderMarkdown(message.content)}
       </div>
     {/if}
