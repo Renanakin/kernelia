@@ -67,7 +67,7 @@ test('Health Bateria 2.2 (Estandard): Estado de servicios de impresion y Windows
   recordTest('ServicesAgent', 'Estándar', q, res, 'list_running_services');
 });
 
-test('Health Bateria 2.3 (Compleja): Verificar si la detencion de BITS e IIS afecta la cola de impresion', async () => {
+test('Health Bateria 2.3 (Compleja): Verificar si la detencion inesperada del servicio BITS e IIS afecta la cola de impresion', async () => {
   const q = 'Verificar si la detención inesperada del servicio BITS y la cola de impresión está bloqueando las tareas en segundo plano.';
   const res = await tryDirectLocalCommand('list_running_services');
   assert.ok(res);
