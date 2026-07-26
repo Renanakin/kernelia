@@ -2,6 +2,7 @@ pub mod client;
 pub mod command_retriever;
 pub mod confidence_engine;
 pub mod function_calling;
+pub mod hitl_checkpoint;
 pub mod intent_engine;
 pub mod knowledge_retriever;
 pub mod live_state_retriever;

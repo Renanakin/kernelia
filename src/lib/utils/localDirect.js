@@ -643,6 +643,40 @@ export async function tryDirectLocalCommand(command, payload = {}) {
     return [];
   }
 
+  if (command === 'create_hitl_checkpoint_cmd') {
+    const code = `CHK-${Math.floor(1000 + Math.random() * 9000)}`;
+    return {
+      id: `chk-${Date.now()}`,
+      checkpoint_code: code,
+      session_id: payload?.session_id || 'web-session',
+      tool_name: payload?.tool_name || 'action',
+      args_json: payload?.args_json || '{}',
+      risk_level: payload?.risk_level || 'R2',
+      required_role: payload?.required_role || 'PowerUser',
+      status: 'pending',
+      requested_at: new Date().toISOString(),
+    };
+  }
+
+  if (command === 'resolve_hitl_checkpoint_cmd') {
+    const code = payload?.checkpoint_code || 'CHK-0000';
+    const action = payload?.action || 'approve';
+    const isApprove = action.toLowerCase() === 'approve';
+    return {
+      checkpoint_code: code,
+      status: isApprove ? 'approved' : 'rejected',
+      executed: isApprove,
+      output: isApprove ? 'Ejecutado con éxito bajo autorización' : null,
+      message: isApprove
+        ? `Estado reanudado exitosamente. La herramienta fue autorizada.`
+        : `Operación #${code} rechazada por el operador.`,
+    };
+  }
+
+  if (command === 'list_pending_checkpoints_cmd') {
+    return [];
+  }
+
   if (command === 'clear_chat') {
     return true;
   }

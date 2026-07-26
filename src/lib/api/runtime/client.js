@@ -103,3 +103,25 @@ export async function createSupportTicket(query, specialty, telemetry) {
 export async function listSupportTickets() {
   return invokeWithPolicy('list_support_tickets_cmd');
 }
+
+export async function createHitlCheckpoint(sessionId, toolName, argsJson, riskLevel, requiredRole) {
+  return invokeWithPolicy('create_hitl_checkpoint_cmd', {
+    session_id: sessionId,
+    tool_name: toolName,
+    args_json: argsJson,
+    risk_level: riskLevel,
+    required_role: requiredRole,
+  });
+}
+
+export async function resolveHitlCheckpoint(checkpointCode, action, password) {
+  return invokeWithPolicy('resolve_hitl_checkpoint_cmd', {
+    checkpoint_code: checkpointCode,
+    action,
+    password,
+  });
+}
+
+export async function listPendingCheckpoints() {
+  return invokeWithPolicy('list_pending_checkpoints_cmd');
+}

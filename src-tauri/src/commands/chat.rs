@@ -424,3 +424,52 @@ pub async fn create_support_ticket_cmd(
 pub async fn list_support_tickets_cmd() -> Result<Vec<crate::rag::models::SupportTicket>, String> {
     crate::ai::ticket_agent::list_support_tickets_from_db()
 }
+
+#[tauri::command]
+pub async fn create_hitl_checkpoint_cmd(
+    session_id: String,
+    tool_name: String,
+    args_json: String,
+    risk_level: String,
+    required_role: String,
+) -> Result<crate::ai::hitl_checkpoint::HitlCheckpoint, String> {
+    common::validate_non_empty("tool_name", &tool_name)?;
+    crate::ai::hitl_checkpoint::create_hitl_checkpoint_record(
+        &session_id,
+        &tool_name,
+        &args_json,
+        &risk_level,
+        &required_role,
+    )
+}
+
+#[tauri::command]
+pub async fn resolve_hitl_checkpoint_cmd(
+    checkpoint_code: String,
+    action: String,
+    password: Option<String>,
+    router: State<'_, Arc<AiRouter>>,
+) -> Result<crate::ai::hitl_checkpoint::CheckpointResolutionResult, String> {
+    common::validate_non_empty("checkpoint_code", &checkpoint_code)?;
+    let settings = router.get_settings()?;
+    let current_user = settings
+        .auth
+        .current_username
+        .as_ref()
+        .cloned()
+        .unwrap_or_else(|| "operador_anonimo".to_string());
+
+    if action.eq_ignore_ascii_case("approve") && password.is_some() {
+        let pass = password.as_deref().unwrap_or("");
+        if !pass.is_empty() && !settings.verify_tecnico_critical_password(pass) && !settings.verify_megaboss_password(pass) {
+            return Err("CLAVE_INVALIDA: La contraseña ingresada para autorizar el checkpoint es incorrecta.".to_string());
+        }
+    }
+
+    crate::ai::hitl_checkpoint::resolve_hitl_checkpoint_record(&checkpoint_code, &action, &current_user)
+}
+
+#[tauri::command]
+pub async fn list_pending_checkpoints_cmd() -> Result<Vec<crate::ai::hitl_checkpoint::HitlCheckpoint>, String> {
+    crate::ai::hitl_checkpoint::list_pending_checkpoints_from_db()
+}

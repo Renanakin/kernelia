@@ -142,6 +142,9 @@ pub fn run() {
             commands::chat::confirm_solution_and_ingest,
             commands::chat::create_support_ticket_cmd,
             commands::chat::list_support_tickets_cmd,
+            commands::chat::create_hitl_checkpoint_cmd,
+            commands::chat::resolve_hitl_checkpoint_cmd,
+            commands::chat::list_pending_checkpoints_cmd,
             // System commands
             commands::system::get_system_info,
             commands::system::list_processes,
