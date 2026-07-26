@@ -128,6 +128,14 @@ fn specialty_rules() -> Vec<(DomainSpecialty, &'static [&'static str])> {
                 "congelado",
                 "latencia del sistema",
                 "alto consumo",
+                "se me reinicia",
+                "se reinicia",
+                "se me reinica",
+                "pantallazo azul",
+                "bsod",
+                "reinicio solo",
+                "kernel power",
+                "apaga solo",
             ],
         ),
         (
@@ -231,6 +239,7 @@ fn detect_symptoms(text: &str) -> Vec<String> {
         ("high_cpu", &["cpu al 100", "alto consumo de cpu"]),
         ("slow_system", &["muy lento", "equipo lento", "se congela", "congelado"]),
         ("update_failure", &["windows update", "no actualiza", "fallo actualizacion"]),
+        ("random_reboot", &["se me reinicia", "se reinicia", "se me reinica", "pantallazo azul", "bsod", "reinicio solo", "kernel power", "apaga solo"]),
         ("security_risk", &["malware", "virus", "intruso", "amenaza"]),
     ];
 
