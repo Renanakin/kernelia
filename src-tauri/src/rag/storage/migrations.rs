@@ -12,6 +12,8 @@ pub const FAQS_100_SEED_SQL: &str =
     include_str!("../../../seeds/0005_kernelia_faqs_100_seed.sql");
 pub const FAQS_WIN_SEED_SQL: &str =
     include_str!("../../../seeds/0006_kernelia_faqs_windows_seed.sql");
+pub const NON_TECH_UTTERANCES_SEED_SQL: &str =
+    include_str!("../../../seeds/0007_kernelia_non_technical_utterances_seed.sql");
 
 pub fn all_migrations() -> [(&'static str, &'static str); 3] {
     [
@@ -21,7 +23,7 @@ pub fn all_migrations() -> [(&'static str, &'static str); 3] {
     ]
 }
 
-pub fn all_seeds() -> [(&'static str, &'static str); 6] {
+pub fn all_seeds() -> [(&'static str, &'static str); 7] {
     [
         ("0001_kernelia_rag_seed_base.sql", BASE_SEED_SQL),
         ("0002_kernelia_rag_seed_tool_catalog.sql", TOOL_CATALOG_SEED_SQL),
@@ -29,5 +31,6 @@ pub fn all_seeds() -> [(&'static str, &'static str); 6] {
         ("0004_kernelia_dictionary_seed.sql", DICTIONARY_SEED_SQL),
         ("0005_kernelia_faqs_100_seed.sql", FAQS_100_SEED_SQL),
         ("0006_kernelia_faqs_windows_seed.sql", FAQS_WIN_SEED_SQL),
+        ("0007_kernelia_non_technical_utterances_seed.sql", NON_TECH_UTTERANCES_SEED_SQL),
     ]
 }

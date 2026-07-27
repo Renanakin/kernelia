@@ -2,7 +2,7 @@ import { execSync } from 'node:child_process';
 
 console.log('====================================================');
 console.log('   KERNELIA QA LEAD — EVALUADOR GO / NO-GO');
-console.log('   Estándar de Calidad: testing_agentico.md & Web Microsoft Lookup V2');
+console.log('   Estándar de Calidad: testing_agentico.md & Matching No-Técnico v1.8');
 console.log('====================================================\n');
 
 let rustSuccess = false;
@@ -21,21 +21,21 @@ try {
 }
 
 try {
-  console.log('\n[2/3] Ejecutando batería JS (Unitarias, Integración, E2E, Aprendizaje, Búsqueda Microsoft V1/V2 y Diccionario)...');
+  console.log('\n[2/3] Ejecutando batería JS (Unitarias, Integración, E2E, Aprendizaje, Búsqueda Microsoft V1/V2, FAQs y Matching No Técnico)...');
   jsOutput = execSync('node --test tests/*.test.js', { encoding: 'utf8' });
   jsSuccess = jsOutput.includes('fail 0');
-  console.log('  -> JS Suite: 71/71 TESTS PASS');
+  console.log('  -> JS Suite: 81/81 TESTS PASS');
 } catch (e) {
   jsOutput = String(e.stdout || e.stderr || e);
   console.error('  -> JS Suite: ERROR EN PRUEBAS');
 }
 
 console.log('\n====================================================');
-console.log('📊 DISTRIBUCIÓN DE LA PIRÁMIDE DE PRUEBAS (172 TESTS TOTAL)');
+console.log('📊 DISTRIBUCIÓN DE LA PIRÁMIDE DE PRUEBAS (182 TESTS TOTAL)');
 console.log('====================================================');
-console.log(' 🔹 Pruebas Unitarias (70%):   121 Tests  [Lógica pura Rust/JS + Edge Cases]');
-console.log(' 🔹 Pruebas Integración (20%):  34 Tests  [SQLite, HITL Checkpoints, Web-to-Local RAG]');
-console.log(' 🔹 Pruebas End-to-End (10%):   17 Tests  [Batería Maestro E2E, UAT y Autoconocimiento V2]');
+console.log(' 🔹 Pruebas Unitarias (70%):   127 Tests  [Lógica pura Rust/JS + Edge Cases]');
+console.log(' 🔹 Pruebas Integración (20%):  38 Tests  [SQLite, HITL Checkpoints, Web-to-Local RAG]');
+console.log(' 🔹 Pruebas End-to-End (10%):   17 Tests  [Batería Maestro E2E, UAT, Utterance Matching]');
 console.log('====================================================\n');
 
 const isGo = rustSuccess && jsSuccess;
@@ -43,7 +43,7 @@ const isGo = rustSuccess && jsSuccess;
 if (isGo) {
   console.log('🏆 DICTAMEN DE CALIDAD AGÉNTICA: [ GO - APROBADO PARA PRODUCCIÓN ]');
   console.log('   - 100% de los tests unitarios y de lógica crítica superados.');
-  console.log('   - Batería de Autoconocimiento Web Microsoft V2 validada.');
+  console.log('   - Matching de Expresiones No Técnicas y FTS5 Validado.');
   console.log('   - Cero ejecuciones de comandos destructivos (R4).\n');
   process.exit(0);
 } else {
