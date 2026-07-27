@@ -172,6 +172,25 @@ ${updatesSummary}`;
 async function buildLocalFirstSupportResponse(message) {
   const text = normalizeText(message);
 
+  if (containsAny(text, ['formatear', 'borrar disco', 'eliminar particion', 'format c:'])) {
+    return {
+      text: [
+        '### Solución',
+        '⚠️ **CANCELADO / OPERACIÓN CRÍTICA ANULADA (Gobernanza R4)**',
+        '1. La operación de formateo o destrucción de datos de la unidad de almacenamiento ha sido **CANCELADA AUTOMÁTICAMENTE**.',
+        '2. KernelIA prohíbe la ejecución autónoma de comandos destructivos de Nivel R4 sin autorización explícita del usuario.',
+        '3. No se han aplicado cambios ni alteraciones físicas en las particiones del sistema.',
+        '',
+        '### Consejos y Recomendaciones',
+        '- Si necesita realizar una reinstalación limpia de Windows, realice un respaldo completo de sus archivos en un disco externo.',
+        '- Utilice las opciones oficiales en Configuración > Sistema > Recuperación > Restablecer este equipo.'
+      ].join('\n'),
+      tools_used: [],
+      model: 'kernelia-local-first',
+      error: 'Operación destructiva R4 bloqueada por gobernanza.',
+    };
+  }
+
   const asksNetwork = containsAny(text, ['red', 'internet', 'dns', 'wifi', 'latencia', 'conexion']);
   const asksUpdates = containsAny(text, ['actualizaciones', 'windows update', 'winget', 'aplicaciones', 'apps']);
 
