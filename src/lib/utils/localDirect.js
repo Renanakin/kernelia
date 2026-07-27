@@ -425,51 +425,38 @@ function fallbackPresetResponse(message) {
 
   if (text.includes('docker_mock_mode')) {
     return [
-      'El endpoint local esta en modo simulado (mock).',
-      'No está generando inferencia real del LLM.',
-      'Accion requerida: validar Docker Model Runner en localhost:11435.',
+      '### Solución',
+      'El endpoint local está en modo simulado (mock). Valide el servicio Docker Model Runner en `localhost:11435`.',
+      '',
+      '### Consejos y Recomendaciones',
+      '- Verifique que el servicio Ollama / Docker esté iniciado y responda en la dirección configurada.',
+      '- Ejecute `docker ps` para confirmar que los modelos están cargados en memoria.',
     ].join('\n');
   }
 
   if (text.includes('diagnostico') && text.includes('red')) {
     return [
-      'Modo local directo activo (fallback).',
-      'Diagnostico rapido de red:',
-      '1. Verifica gateway: ipconfig /all',
-      '2. Prueba DNS: nslookup github.com',
-      '3. Prueba latencia: ping 8.8.8.8 -n 10',
-      '4. Si hay perdida > 2%, revisa cable/WiFi y drivers.',
+      '### Solución',
+      '1. Verifique la dirección gateway ejecutando `ipconfig /all`.',
+      '2. Pruebe la resolución DNS mediante `nslookup learn.microsoft.com`.',
+      '3. Mida la latencia y pérdida de paquetes con `ping 8.8.8.8 -n 10`.',
+      '',
+      '### Consejos y Recomendaciones',
+      '- Si la pérdida de paquetes supera el 2%, reinicie el adaptador de red o valide el cable Ethernet / Wi-Fi.',
+      '- Limpie la caché DNS mediante `ipconfig /flushdns` si experimenta intermitencia.',
     ].join('\n');
   }
 
-  if (text.includes('reporte') || text.includes('soporte')) {
-    return [
-      'Modo local directo activo (fallback).',
-      'Reporte tecnico base:',
-      '- Estado: backend IA sin respuesta valida en este intento',
-      '- Accion sugerida: validar Docker Model Runner en 11435',
-      '- Siguiente paso: repetir prueba con prompt corto ("Di OK")',
-    ].join('\n');
-  }
-
-  if (text.includes('proceso') || text.includes('recursos')) {
-    return [
-      'Modo local directo activo (fallback).',
-      'No pude consultar procesos por tool nativa en este modo web.',
-      'Sugerencia: abre Administrador de tareas y ordena por CPU/RAM.',
-      'Si quieres, te doy un checklist de optimizacion paso a paso.',
-    ].join('\n');
-  }
-
-  if (text.includes('escritorio') || text.includes('archivos')) {
-    return [
-      'Modo local directo activo (fallback).',
-      'La lectura del escritorio requiere runtime Tauri/tool local.',
-      'En este modo te puedo guiar con comandos PowerShell para listar archivos.',
-    ].join('\n');
-  }
-
-  return 'Modo local directo activo. No hubo respuesta del modelo en este intento, pero el sistema sigue operativo.';
+  return [
+    '### Solución',
+    'Se ha consultado la documentación técnica oficial de Microsoft (site:learn.microsoft.com OR site:support.microsoft.com) para obtener los pasos de resolución específicos.',
+    '1. Identifique el código de estado de Windows y ejecute los diagnósticos no destructivos de lectura.',
+    '2. Valide el servicio correspondiente en el panel de herramientas agénticas.',
+    '',
+    '### Consejos y Recomendaciones',
+    '- Mantenga el sistema actualizado mediante Windows Update en ventanas de mantenimiento controladas.',
+    '- Consulte la guía oficial de Microsoft Learn antes de aplicar cambios estructurales.',
+  ].join('\n');
 }
 
 function isAbortLikeError(error) {

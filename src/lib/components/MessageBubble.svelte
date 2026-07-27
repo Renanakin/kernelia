@@ -71,7 +71,7 @@
           <div class="absolute inset-0 border-2 border-gray-400 rounded-full border-t-transparent animate-spin"></div>
         </div>
         <span class="text-xs font-mono tracking-wider">
-          {message.content ? 'PROCESANDO...' : 'PENSANDO...'}
+          {message.statusMessage || (message.content ? 'PROCESANDO...' : 'Buscando solución en Microsoft...')}
         </span>
       </div>
     {:else if hasError}

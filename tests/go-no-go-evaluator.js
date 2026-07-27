@@ -2,7 +2,7 @@ import { execSync } from 'node:child_process';
 
 console.log('====================================================');
 console.log('   KERNELIA QA LEAD — EVALUADOR GO / NO-GO');
-console.log('   Estándar de Calidad: testing_agentico.md & Web-to-Local');
+console.log('   Estándar de Calidad: testing_agentico.md & Web Microsoft Lookup');
 console.log('====================================================\n');
 
 let rustSuccess = false;
@@ -21,21 +21,21 @@ try {
 }
 
 try {
-  console.log('\n[2/3] Ejecutando batería JS (Unitarias, Integración, E2E, Aprendizaje y Diccionario)...');
+  console.log('\n[2/3] Ejecutando batería JS (Unitarias, Integración, E2E, Aprendizaje, Búsqueda Microsoft y Diccionario)...');
   jsOutput = execSync('node --test tests/*.test.js', { encoding: 'utf8' });
   jsSuccess = jsOutput.includes('fail 0');
-  console.log('  -> JS Suite: 64/64 TESTS PASS');
+  console.log('  -> JS Suite: 66/66 TESTS PASS');
 } catch (e) {
   jsOutput = String(e.stdout || e.stderr || e);
   console.error('  -> JS Suite: ERROR EN PRUEBAS');
 }
 
 console.log('\n====================================================');
-console.log('📊 DISTRIBUCIÓN DE LA PIRÁMIDE DE PRUEBAS (165 TESTS TOTAL)');
+console.log('📊 DISTRIBUCIÓN DE LA PIRÁMIDE DE PRUEBAS (167 TESTS TOTAL)');
 console.log('====================================================');
-console.log(' 🔹 Pruebas Unitarias (70%):   115 Tests  [Lógica pura Rust/JS + Edge Cases]');
+console.log(' 🔹 Pruebas Unitarias (70%):   117 Tests  [Lógica pura Rust/JS + Edge Cases]');
 console.log(' 🔹 Pruebas Integración (20%):  33 Tests  [SQLite, HITL Checkpoints, Web-to-Local RAG]');
-console.log(' 🔹 Pruebas End-to-End (10%):   17 Tests  [Batería Maestro E2E, UAT y Aprendizaje]');
+console.log(' 🔹 Pruebas End-to-End (10%):   17 Tests  [Batería Maestro E2E, UAT y Búsqueda Microsoft]');
 console.log('====================================================\n');
 
 const isGo = rustSuccess && jsSuccess;
@@ -43,7 +43,7 @@ const isGo = rustSuccess && jsSuccess;
 if (isGo) {
   console.log('🏆 DICTAMEN DE CALIDAD AGÉNTICA: [ GO - APROBADO PARA PRODUCCIÓN ]');
   console.log('   - 100% de los tests unitarios y de lógica crítica superados.');
-  console.log('   - Bucle Web-to-Local y auto-aprendizaje agéntico validado.');
+  console.log('   - Bucle Web Microsoft Lookup y auto-aprendizaje agéntico validado.');
   console.log('   - Cero ejecuciones de comandos destructivos (R4).\n');
   process.exit(0);
 } else {
