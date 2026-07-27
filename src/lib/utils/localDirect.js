@@ -350,6 +350,25 @@ async function buildLocalFirstSupportResponse(message) {
     };
   }
 
+  if (containsAny(text, ['driver', 'driveres', 'controlador', 'controladores', 'administrador de dispositivos'])) {
+    return {
+      text: [
+        '### Solución',
+        '1. Presione `Win + X` y seleccione **Administrador de dispositivos** (`devmgmt.msc`).',
+        '2. Despliegue la categoría correspondiente (ej. Adaptadores de pantalla o de red).',
+        '3. Si el dispositivo muestra un signo de advertencia amarillo (Código 43 o Código 10), haga clic derecho y seleccione **Propiedades**.',
+        '4. En la pestaña **Controlador**, seleccione **Actualizar controlador** o **Revertir al controlador anterior**.',
+        '',
+        '### Consejos y Recomendaciones',
+        '- Descargue únicamente controladores oficiales firmados desde el sitio web oficial del fabricante (NVIDIA, AMD, Intel, Realtek).',
+        '- Evite herramientas no oficiales de actualización de controladores de terceros.',
+      ].join('\n'),
+      tools_used: [],
+      model: 'kernelia-local-first',
+      error: null,
+    };
+  }
+
   if (containsAny(text, ['reporte tecnico', 'reporte', 'soporte'])) {
     const sys = await tryDirectLocalCommand('get_system_info');
     const info = typeof sys === 'string' ? safeJsonParse(sys, {}) : sys;
@@ -370,19 +389,11 @@ async function buildLocalFirstSupportResponse(message) {
     };
   }
 
-  if (!isSupportIntent(text)) {
-    return null;
-  }
-
   return {
-    text: [
-      'KernelIA esta operando en modo web directo.',
-      'No tengo acceso al sistema operativo desde este navegador.',
-      'Recomendacion: usa la app con runtime Tauri para que las herramientas locales respondan con evidencia real.',
-    ].join('\n'),
+    text: fallbackPresetResponse(message),
     tools_used: [],
     model: 'kernelia-local-first',
-    error: 'Sin runtime Tauri',
+    error: null,
   };
 }
 

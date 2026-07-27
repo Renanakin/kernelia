@@ -16,12 +16,15 @@ pub const NON_TECH_UTTERANCES_SEED_SQL: &str =
     include_str!("../../../seeds/0007_kernelia_non_technical_utterances_seed.sql");
 pub const MASTER_SOLUTIONS_SEED_SQL: &str =
     include_str!("../../../seeds/0008_kernelia_master_solutions_seed.sql");
+pub const AUDIT_LOGS_SQL: &str =
+    include_str!("../../../migrations/0004_kernelia_audit_and_interaction_logs.sql");
 
-pub fn all_migrations() -> [(&'static str, &'static str); 3] {
+pub fn all_migrations() -> [(&'static str, &'static str); 4] {
     [
         ("0001_kernelia_rag_init.sql", INIT_SQL),
         ("0002_kernelia_rag_support_tickets.sql", TICKETS_SQL),
         ("0003_kernelia_hitl_checkpoints.sql", CHECKPOINTS_SQL),
+        ("0004_kernelia_audit_and_interaction_logs.sql", AUDIT_LOGS_SQL),
     ]
 }
 
