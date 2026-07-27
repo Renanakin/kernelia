@@ -107,29 +107,28 @@ function formatSystemInfoSummary(info) {
     ? 'Modo web: sin acceso directo al sistema operativo.'
     : 'Acceso local disponible.';
 
-  return `**Estado detectado**
-
-- CPU: ${cpu}
-- Memoria: ${memoryUsed} / ${memoryTotal}
-- Discos visibles: ${disks.length}
+  return `### Solución
+- Diagnóstico general de recursos del sistema ejecutado.
+- CPU: ${cpu} | Memoria: ${memoryUsed} / ${memoryTotal}
+- Unidades de disco visibles: ${disks.length}
 - ${browserNote}
 
-**Recomendacion**
-
-Abre KernelIA con runtime Tauri si necesitas datos reales del sistema.`;
+### Consejos y Recomendaciones
+- Abra KernelIA con runtime Tauri para obtener datos en tiempo real de los sensores físicos del hardware.
+- Ordene por uso de CPU/RAM si experimenta congelamiento parcial en aplicaciones.`;
 }
 
 function formatNetworkSummary(data) {
   const connectivity = data?.connectivity?.google_ping?.latency || 'n/a';
   const status = data?.status || 'n/a';
-  return `**Estado de red**
+  return `### Solución
+1. Verifique el estado del adaptador de red local y la dirección IP mediante \`ipconfig /all\`.
+2. Mida la latencia y tasa de respuesta: Salud general: ${status} | Ping Google: ${connectivity}.
+3. Limpie la caché DNS del sistema mediante \`ipconfig /flushdns\` si falla la resolución de nombres.
 
-- Salud general: ${status}
-- Ping Google: ${connectivity}
-
-**Recomendacion**
-
-Si la latencia sube o falla DNS, revisa gateway y adaptador.`;
+### Consejos y Recomendaciones
+- Si la pérdida de paquetes o latencia sube significativamente, revise el gateway predeterminado y el adaptador Wi-Fi/Ethernet.
+- Consulte los dominios oficiales de Microsoft Learn para diagnosticar políticas de red corporativas.`;
 }
 
 function formatProcessesSummary(raw) {
@@ -137,14 +136,14 @@ function formatProcessesSummary(raw) {
   const count = Array.isArray(processes) ? processes.length : 0;
   const top = Array.isArray(processes) && processes.length > 0 ? processes[0] : null;
 
-  return `**Procesos detectados**
+  return `### Solución
+1. Inspección de lista de procesos del sistema completada. Total visible: ${count}.
+2. ${top ? `Proceso con mayor consumo actual: \`${top.name || top.process_name || 'n/a'}\`.` : 'Sin lista real de procesos en modo web direct.'}
+3. Cierre aplicaciones inactivas en segundo plano si la memoria disponible disminuye.
 
-- Total visible: ${count}
-- ${top ? `Proceso principal: ${top.name || top.process_name || 'n/a'}` : 'Sin lista real disponible en modo web.'}
-
-**Recomendacion**
-
-Si el equipo esta lento, revisa CPU/RAM en el runtime local.`;
+### Consejos y Recomendaciones
+- Supervise eventos de desbordamiento de memoria mediante el Administrador de tareas.
+- Evite finalizar procesos críticos del sistema operativo sin autorización previa.`;
 }
 
 function formatUpdatesSummary(windowsUpdateRaw, appUpdatesRaw) {
@@ -154,14 +153,14 @@ function formatUpdatesSummary(windowsUpdateRaw, appUpdatesRaw) {
   const windowsStatus = windowsUpdate?.Status ?? windowsUpdate?.status ?? 'n/a';
   const windowsName = windowsUpdate?.Name ?? windowsUpdate?.name ?? 'wuauserv';
 
-  return `**Actualizaciones detectadas**
+  return `### Solución
+1. Verificación del servicio de actualizaciones de Windows (\`${windowsName}\`): Estado **${windowsStatus}**.
+2. ${appUpdates ? appUpdates.split('\n')[0] : 'Aplicaciones: sin parches adicionales reportados.'}
+3. Ejecute la instalación de parches acumulativos desde el panel oficial de Windows Update.
 
-- Windows Update (${windowsName}): ${windowsStatus}
-- ${appUpdates ? appUpdates.split('\n')[0] : 'Apps: sin datos disponibles en este modo.'}
-
-**Recomendacion**
-
-Aplica updates en ventana controlada y vuelve a validar.`;
+### Consejos y Recomendaciones
+- Aplique actualizaciones de seguridad en ventanas de mantenimiento controladas para evitar reinicios inesperados.
+- En caso de errores 0x80070002 o 0x800f081f, consulte la guía oficial de restauración en Microsoft Learn.`;
 }
 
 function formatCombinedNetworkUpdatesSummary(networkSummary, updatesSummary) {
