@@ -172,7 +172,7 @@ ${updatesSummary}`;
 async function buildLocalFirstSupportResponse(message) {
   const text = normalizeText(message);
 
-  if (containsAny(text, ['formatear', 'borrar disco', 'eliminar particion', 'format c:'])) {
+  if (containsAny(text, ['formatear', 'borrar disco', 'eliminar particion', 'format c:', 'eliminar carpeta', 'borrar carpeta', 'system32'])) {
     return {
       text: [
         '### Solución',

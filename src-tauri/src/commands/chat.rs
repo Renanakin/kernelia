@@ -473,3 +473,20 @@ pub async fn resolve_hitl_checkpoint_cmd(
 pub async fn list_pending_checkpoints_cmd() -> Result<Vec<crate::ai::hitl_checkpoint::HitlCheckpoint>, String> {
     crate::ai::hitl_checkpoint::list_pending_checkpoints_from_db()
 }
+
+#[tauri::command]
+pub async fn verify_tech_password_cmd(
+    password: String,
+    required_role: String,
+) -> Result<crate::ai::rbac_elevation_verifier::ElevationResponse, String> {
+    Ok(crate::ai::rbac_elevation_verifier::verify_technical_password(&password, &required_role))
+}
+
+#[tauri::command]
+pub async fn log_user_interaction_cmd(
+    record: crate::ai::rbac_elevation_verifier::UserInteractionRecord,
+) -> Result<bool, String> {
+    // Registro de auditoria simulado en runtime Tauri
+    println!("[AUDIT LOG] Session: {} | User: {} | Query: {} | Risk: {:?}", record.session_id, record.user_id, record.query_text, record.command_risk_level);
+    Ok(true)
+}

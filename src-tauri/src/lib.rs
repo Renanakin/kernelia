@@ -145,6 +145,8 @@ pub fn run() {
             commands::chat::create_hitl_checkpoint_cmd,
             commands::chat::resolve_hitl_checkpoint_cmd,
             commands::chat::list_pending_checkpoints_cmd,
+            commands::chat::verify_tech_password_cmd,
+            commands::chat::log_user_interaction_cmd,
             // System commands
             commands::system::get_system_info,
             commands::system::list_processes,

@@ -17,6 +17,7 @@ pub mod ticket_agent;
 pub mod tool_verifier;
 pub mod trace_engine;
 pub mod decision_engine;
+pub mod rbac_elevation_verifier;
 
 pub use models::ChatMessage;
 pub use router::AiRouter;
