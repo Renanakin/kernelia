@@ -21,17 +21,17 @@ try {
 }
 
 try {
-  console.log('\n[2/3] Ejecutando batería JS Completa (Unitarias, Integración, E2E 100%, Aprendizaje, Búsqueda Microsoft V1/V2, FAQs, Soluciones Maestras y Auditoría 4 Fases RBAC)...');
+  console.log('\n[2/3] Ejecutando batería JS Completa (Unitarias, Integración, E2E 100%, Aprendizaje, Búsqueda Microsoft V1/V2, FAQs, Soluciones Maestras, Auditoría RBAC y UAT 5 Objetivos)...');
   jsOutput = execSync('node --test tests/*.test.js', { encoding: 'utf8' });
   jsSuccess = jsOutput.includes('fail 0');
-  console.log('  -> JS Suite: 108/108 TESTS PASS');
+  console.log('  -> JS Suite: 113/113 TESTS PASS');
 } catch (e) {
   jsOutput = String(e.stdout || e.stderr || e);
   console.error('  -> JS Suite: ERROR EN PRUEBAS');
 }
 
 console.log('\n====================================================');
-console.log('📊 DISTRIBUCIÓN DE LA PIRÁMIDE DE PRUEBAS (209 TESTS TOTAL)');
+console.log('📊 DISTRIBUCIÓN DE LA PIRÁMIDE DE PRUEBAS (214 TESTS TOTAL)');
 console.log('====================================================');
 console.log(' 🔹 Pruebas Unitarias (70%):   144 Tests  [Lógica pura Rust/JS + Edge Cases]');
 console.log(' 🔹 Pruebas Integración (20%):  44 Tests  [SQLite, HITL Checkpoints, Web-to-Local RAG, Auditoría]');
